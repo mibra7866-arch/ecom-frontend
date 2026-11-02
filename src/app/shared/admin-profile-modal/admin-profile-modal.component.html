@@ -1,0 +1,26 @@
+<div class="bank-modal">
+  <header class="bank-modal__header">
+    <h2>Edit Profile</h2>
+    <p>Your name and email.</p>
+  </header>
+
+  <form [formGroup]="form" class="bank-modal__body">
+    <label class="bank-modal__field">
+      <span>Full name</span>
+      <input type="text" formControlName="name" />
+    </label>
+
+    <label class="bank-modal__field">
+      <span>Email</span>
+      <input type="email" formControlName="email" />
+      @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+        <span class="bank-modal__error">Enter a valid email address</span>
+      }
+    </label>
+  </form>
+
+  <footer class="bank-modal__footer">
+    <button type="button" class="bank-modal__btn bank-modal__btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="bank-modal__btn bank-modal__btn--solid" [disabled]="form.invalid" (click)="save()">Save</button>
+  </footer>
+</div>

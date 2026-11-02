@@ -1,0 +1,58 @@
+<div class="bank-modal">
+  <header class="bank-modal__header">
+    <h2>{{ data.title }}</h2>
+    <p>{{ data.subtitle ?? 'This is where withdrawal payouts are sent.' }}</p>
+  </header>
+
+  <form [formGroup]="form" class="bank-modal__body">
+    <label class="bank-modal__field">
+      <span>Account holder name</span>
+      <input type="text" formControlName="accountHolderName" />
+      @if (form.controls.accountHolderName.invalid && form.controls.accountHolderName.touched) {
+        <span class="bank-modal__error">Account holder name is required</span>
+      }
+    </label>
+
+    <label class="bank-modal__field">
+      <span>{{ data.providerLabel ?? 'Bank name' }}</span>
+      <input type="text" formControlName="bankName" />
+      @if (form.controls.bankName.invalid && form.controls.bankName.touched) {
+        <span class="bank-modal__error">{{ data.providerLabel ?? 'Bank name' }} is required</span>
+      }
+    </label>
+
+    <label class="bank-modal__field">
+      <span>{{ data.accountNumberLabel ?? 'Account number' }}</span>
+      <input type="text" [attr.inputmode]="(data.accountNumberDigitsOnly ?? true) ? 'numeric' : null" formControlName="accountNumber" />
+      @if (form.controls.accountNumber.hasError('required') && form.controls.accountNumber.touched) {
+        <span class="bank-modal__error">{{ data.accountNumberLabel ?? 'Account number' }} is required</span>
+      } @else if (form.controls.accountNumber.hasError('pattern') && form.controls.accountNumber.touched) {
+        <span class="bank-modal__error">{{ data.accountNumberLabel ?? 'Account number' }} must contain digits only</span>
+      }
+    </label>
+
+    @if (data.showIban ?? true) {
+      <label class="bank-modal__field">
+        <span>IBAN (optional)</span>
+        <input type="text" formControlName="iban" />
+        @if (form.controls.iban.hasError('ibanFormat') && form.controls.iban.touched) {
+          <span class="bank-modal__error">Enter a valid IBAN format (e.g. country code + digits)</span>
+        } @else if (form.controls.iban.hasError('ibanChecksum') && form.controls.iban.touched) {
+          <span class="bank-modal__error">This IBAN doesn't look valid — check for a typo</span>
+        }
+      </label>
+    }
+
+    @if (data.requireReason) {
+      <label class="bank-modal__field">
+        <span>Reason <span class="bank-modal__required">(required, for the audit trail)</span></span>
+        <textarea rows="2" [ngModel]="reason()" [ngModelOptions]="{ standalone: true }" (ngModelChange)="reason.set($event)" placeholder="Why is this correction being made?"></textarea>
+      </label>
+    }
+  </form>
+
+  <footer class="bank-modal__footer">
+    <button type="button" class="bank-modal__btn bank-modal__btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="bank-modal__btn bank-modal__btn--solid" [disabled]="!canSave()" (click)="save()">Save</button>
+  </footer>
+</div>

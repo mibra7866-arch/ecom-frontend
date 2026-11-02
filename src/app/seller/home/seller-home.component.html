@@ -1,0 +1,242 @@
+<div class="seller-home">
+  <!-- Header card: avatar, name, status pills, member-since — left-aligned row (avatar + info column),
+       not a centered stack. -->
+  <div class="seller-home__banner">
+    <div class="seller-home__avatar-wrap">
+      <div class="seller-home__avatar">{{ (tokenService.claims().name ?? '?').charAt(0).toUpperCase() }}</div>
+    </div>
+    <div class="seller-home__banner-info">
+      <h1 class="seller-home__name">{{ profile()?.storeName ?? tokenService.claims().name }}</h1>
+      <p class="seller-home__owner">{{ tokenService.claims().name }}</p>
+
+      <div class="seller-home__pills">
+        @if (isVerified()) {
+          <span class="seller-home__pill seller-home__pill--verified">
+            <mat-icon>verified</mat-icon>
+            Verified
+          </span>
+        }
+        @if (accountStatus(); as s) {
+          <span class="seller-home__pill">{{ statusLabel(s) }}</span>
+        }
+        <span class="seller-home__pill seller-home__pill--rating">
+          <mat-icon>star</mat-icon>
+          {{ rating() ?? 'Not rated' }}
+        </span>
+        <span class="seller-home__pill">Credit Score: {{ creditScore() }}</span>
+      </div>
+
+      @if (profile(); as p) {
+        <p class="seller-home__member-since">Member since {{ p.createdAt | date: 'MMM yyyy' }}</p>
+      }
+    </div>
+  </div>
+
+  @if (profileError()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ profileError() }}</span>
+    </div>
+  }
+  @if (bankDetailsError()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ bankDetailsError() }}</span>
+    </div>
+  }
+  @if (transactionPasswordError()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ transactionPasswordError() }}</span>
+    </div>
+  }
+
+  <!-- Balance card -->
+  <div class="seller-home__balance-card">
+    <a class="seller-home__balance-item" routerLink="/seller/topup">
+      <span class="seller-home__balance-label">
+        <mat-icon>account_balance_wallet</mat-icon>
+        Shop Balance
+      </span>
+      <span class="seller-home__balance-row">
+        <span class="seller-home__balance-value">{{ sellerBalanceService.balance() | currency }}</span>
+        <mat-icon class="seller-home__balance-chevron">chevron_right</mat-icon>
+      </span>
+    </a>
+    <div class="seller-home__balance-divider"></div>
+    <div class="seller-home__balance-item">
+      <span class="seller-home__balance-label">
+        <mat-icon>shield</mat-icon>
+        Guarantee
+      </span>
+      <span class="seller-home__balance-value">{{ sellerBalanceService.guaranteeBalance() | currency }}</span>
+    </div>
+  </div>
+
+  <!-- Settings menu -->
+  <div class="seller-home__menu">
+    <button type="button" class="seller-home__menu-row" (click)="editProfile()">
+      <span class="seller-home__menu-icon seller-home__menu-icon--blue"><mat-icon>storefront</mat-icon></span>
+      <span class="seller-home__menu-text">
+        <span class="seller-home__menu-title">Shop</span>
+        <span class="seller-home__menu-subtitle">Shop name</span>
+      </span>
+      <mat-icon class="seller-home__menu-chevron">chevron_right</mat-icon>
+    </button>
+
+    <button type="button" class="seller-home__menu-row" (click)="editProfile()">
+      <span class="seller-home__menu-icon seller-home__menu-icon--indigo"><mat-icon>person</mat-icon></span>
+      <span class="seller-home__menu-text">
+        <span class="seller-home__menu-title">Account</span>
+        <span class="seller-home__menu-subtitle">Full name &amp; email</span>
+      </span>
+      <mat-icon class="seller-home__menu-chevron">chevron_right</mat-icon>
+    </button>
+
+    <button type="button" class="seller-home__menu-row" [matMenuTriggerFor]="securityMenu">
+      <span class="seller-home__menu-icon seller-home__menu-icon--amber"><mat-icon>lock</mat-icon></span>
+      <span class="seller-home__menu-text">
+        <span class="seller-home__menu-title">Security</span>
+        <span class="seller-home__menu-subtitle">Login &amp; transaction password</span>
+      </span>
+      <mat-icon class="seller-home__menu-chevron">chevron_right</mat-icon>
+    </button>
+    <mat-menu #securityMenu="matMenu">
+      <button mat-menu-item (click)="changePassword()">
+        <mat-icon>lock_reset</mat-icon>
+        Change Password
+      </button>
+      <button mat-menu-item (click)="bankDetails()?.hasTransactionPassword ? changeTransactionPassword() : setTransactionPassword()">
+        <mat-icon>password</mat-icon>
+        {{ bankDetails()?.hasTransactionPassword ? 'Change' : 'Set' }} Transaction Password
+      </button>
+    </mat-menu>
+
+    <button type="button" class="seller-home__menu-row" (click)="editBankDetails()">
+      <span class="seller-home__menu-icon seller-home__menu-icon--purple"><mat-icon>payments</mat-icon></span>
+      <span class="seller-home__menu-text">
+        <span class="seller-home__menu-title">Payout Method</span>
+        <span class="seller-home__menu-subtitle">Bank accounts &amp; wallets for withdrawals</span>
+      </span>
+      <mat-icon class="seller-home__menu-chevron">chevron_right</mat-icon>
+    </button>
+
+    <button type="button" class="seller-home__menu-row" (click)="toggleVerify()">
+      <span class="seller-home__menu-icon seller-home__menu-icon--green"><mat-icon>gpp_good</mat-icon></span>
+      <span class="seller-home__menu-text">
+        <span class="seller-home__menu-title">Verify</span>
+        <span class="seller-home__menu-subtitle">Identity verification</span>
+      </span>
+      <mat-icon class="seller-home__menu-chevron">{{ verifyExpanded() ? 'expand_less' : 'chevron_right' }}</mat-icon>
+    </button>
+  </div>
+
+  <!-- KYC verification status + resubmission — revealed by the "Verify" row above -->
+  @if (verifyExpanded()) {
+    <div class="seller-home__card">
+      <div class="seller-home__section">
+        <div class="seller-home__card-header">
+          <h2>KYC Verification</h2>
+          @if (kycSubmission(); as k) {
+            <span class="kyc-badge" [class.kyc-badge--approved]="k.status === 'Approved'" [class.kyc-badge--pending]="k.status === 'AwaitingVerification'" [class.kyc-badge--rejected]="k.status === 'Rejected'">
+              @switch (k.status) {
+                @case ('Approved') { <mat-icon>verified</mat-icon> Approved }
+                @case ('AwaitingVerification') { <mat-icon>hourglass_top</mat-icon> Under review }
+                @case ('Rejected') { <mat-icon>gpp_bad</mat-icon> Rejected }
+              }
+            </span>
+          }
+        </div>
+
+        @if (kycLoading()) {
+          <mat-spinner diameter="24"></mat-spinner>
+        } @else if (kycSubmission(); as k) {
+          @if (k.status === 'Approved') {
+            <p class="seller-home__kyc-hint">Your identity has been verified. Products and Orders are fully unlocked.</p>
+          } @else if (k.status === 'AwaitingVerification') {
+            <p class="seller-home__kyc-hint">Your documents are under review. We'll notify you as soon as a decision is made.</p>
+          } @else {
+            <div class="kyc-reject-reason">
+              <strong>Reason for rejection:</strong>
+              <span>{{ k.rejectionReason || 'No reason provided.' }}</span>
+            </div>
+
+            <p class="seller-home__kyc-hint">Upload a new front and back photo of your ID to resubmit for review.</p>
+
+            @if (kycError()) {
+              <div class="error-banner">
+                <mat-icon>error</mat-icon>
+                <span>{{ kycError() }}</span>
+              </div>
+            }
+
+            @if (kycSuccessMessage()) {
+              <div class="success-banner">
+                <mat-icon>check_circle</mat-icon>
+                <span>{{ kycSuccessMessage() }}</span>
+              </div>
+            }
+
+            <div class="kyc-resubmit-uploads">
+              <div class="kyc-resubmit-upload">
+                <span class="kyc-resubmit-upload__label">ID Front</span>
+                <app-file-upload
+                  [multiple]="false"
+                  [files]="kycFrontFile() ? [kycFrontFile()!] : []"
+                  (filesSelected)="onKycFrontSelected($event)"
+                  (fileRemoved)="onKycFrontRemoved()"
+                  theme="light"
+                  [dense]="true"
+                ></app-file-upload>
+              </div>
+              <div class="kyc-resubmit-upload">
+                <span class="kyc-resubmit-upload__label">ID Back</span>
+                <app-file-upload
+                  [multiple]="false"
+                  [files]="kycBackFile() ? [kycBackFile()!] : []"
+                  (filesSelected)="onKycBackSelected($event)"
+                  (fileRemoved)="onKycBackRemoved()"
+                  theme="light"
+                  [dense]="true"
+                ></app-file-upload>
+              </div>
+            </div>
+
+            <button
+              mat-flat-button
+              color="primary"
+              class="kyc-resubmit-btn"
+              [disabled]="!kycResubmitValid() || kycSubmitting()"
+              (click)="submitKycResubmission()"
+            >
+              <mat-icon>upload_file</mat-icon>
+              {{ kycSubmitting() ? 'Submitting…' : 'Resubmit KYC' }}
+            </button>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Mobile-only: the bottom tab bar only surfaces Dashboard/Products/Orders/Notifications/Profile
+       (see seller-sidebar.component.html), so Top Up/Chat move here instead of becoming
+       unreachable on phone widths. Hidden above bp.mobile, where the full sidebar nav already covers these. -->
+  <nav class="seller-home__quick-links">
+    <a class="seller-home__quick-link" routerLink="/seller/topup">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <span>Top Up</span>
+    </a>
+    <a class="seller-home__quick-link" routerLink="/seller/chat">
+      <mat-icon>chat</mat-icon>
+      <span>Chat with support</span>
+    </a>
+  </nav>
+
+  <button type="button" class="seller-home__menu-row seller-home__menu-row--logout" (click)="logout()">
+    <span class="seller-home__menu-icon seller-home__menu-icon--red"><mat-icon>logout</mat-icon></span>
+    <span class="seller-home__menu-text">
+      <span class="seller-home__menu-title">Log out</span>
+      <span class="seller-home__menu-subtitle">Sign out of your seller account</span>
+    </span>
+  </button>
+</div>

@@ -1,0 +1,203 @@
+// Shared "search sellers, pick one" dialog chrome — used by both OrderAssignDialogComponent (Orders
+// list's Assign action) and ProductAssignDialogComponent (product card's Assign Order action), which
+// differ only in what happens after a seller is picked, not in how the search/results UI looks.
+@use 'breakpoints' as bp;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+}
+
+.assign-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+.assign-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 16px;
+  flex: none;
+
+  @include bp.mobile {
+    padding: 18px 18px 12px;
+  }
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--ecom-text-muted);
+  }
+}
+
+.assign-dialog__close {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+  }
+
+  @include bp.mobile {
+    @include bp.touch-target(44px);
+  }
+}
+
+.assign-dialog__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 28px 24px;
+
+  @include bp.mobile {
+    padding: 0 18px 18px;
+  }
+}
+
+.assign-dialog__error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--ecom-red);
+  font-size: 0.85rem;
+}
+
+.assign-dialog__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 14px;
+  margin-bottom: 14px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 10px;
+  background: var(--ecom-surface-alt);
+
+  @include bp.mobile {
+    height: 44px;
+  }
+
+  mat-icon {
+    color: var(--ecom-text-muted);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.9rem;
+    color: var(--ecom-text);
+    font-family: inherit;
+
+    &::placeholder {
+      color: var(--ecom-text-muted);
+    }
+  }
+}
+
+.assign-dialog__state {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.assign-dialog__empty {
+  margin: 0;
+  padding: 20px 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ecom-text-muted);
+}
+
+.assign-dialog__results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.assign-dialog__result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+
+  &--disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+.assign-dialog__avatar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--ecom-indigo);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.assign-dialog__result-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.assign-dialog__result-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ecom-text);
+}
+
+.assign-dialog__result-store {
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+}

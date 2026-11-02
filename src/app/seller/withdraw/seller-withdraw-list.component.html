@@ -1,0 +1,82 @@
+<div class="requests-page scroll-fixed">
+  <header class="requests-header">
+    <div class="requests-header__title-row">
+      <span class="requests-header__icon"><mat-icon>north_east</mat-icon></span>
+      <div class="requests-header__text">
+        <h1 class="requests-header__title">Withdraw</h1>
+        @if (!loading() && !errorMessage()) {
+          <p class="requests-header__subtext">{{ totalCount() }} request{{ totalCount() === 1 ? '' : 's' }} · Available: {{ availableBalance() | currency }}</p>
+        }
+      </div>
+    </div>
+    <button type="button" class="add-btn" (click)="openWithdrawModal()">
+      <mat-icon>add</mat-icon>
+      Withdraw
+    </button>
+  </header>
+
+  @if (creditScoreTooLow()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>Withdrawal unavailable: Your credit score is too low. A minimum credit score of 90 is required to withdraw funds.</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="state">
+      <span class="spinner"></span>
+      <p>Loading requests…</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="state state--error">
+      <mat-icon>error</mat-icon>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" class="retry-btn" (click)="load()">Retry</button>
+    </div>
+  } @else if (requests().length === 0) {
+    <div class="state">
+      <mat-icon>north_east</mat-icon>
+      <p>No withdrawal requests yet</p>
+      <button type="button" class="add-btn" (click)="openWithdrawModal()">
+        <mat-icon>add</mat-icon>
+        Withdraw
+      </button>
+    </div>
+  } @else {
+    <div class="requests-list scroll-area">
+      @for (r of requests(); track r.id) {
+        <div class="request-row">
+          <div class="request-row__main">
+            <span class="request-row__amount">{{ r.amount | currency }}</span>
+            <span class="request-row__date">{{ r.requestedAt | date: 'mediumDate' }}</span>
+          </div>
+          <div class="request-row__end">
+            @if (r.status === 'Rejected' && r.reviewComment) {
+              <span class="request-row__reason">{{ r.reviewComment }}</span>
+            } @else if (r.status === 'Pending' && r.reviewedAtUtc && r.reviewComment) {
+              <span class="request-row__note">{{ r.reviewComment }}</span>
+            } @else if (r.note) {
+              <span class="request-row__note">{{ r.note }}</span>
+            }
+            @if (r.receiptUrl) {
+              @if (isImageReceipt(r.receiptUrl)) {
+                <button type="button" class="request-row__receipt" (click)="openReceiptImage($event, r.receiptUrl)">
+                  <mat-icon>description</mat-icon>
+                  View receipt
+                </button>
+              } @else {
+                <a class="request-row__receipt" [href]="fileUrl(r.receiptUrl)" target="_blank" rel="noopener">
+                  <mat-icon>description</mat-icon>
+                  View receipt
+                </a>
+              }
+            }
+            <app-status-badge [status]="r.status"></app-status-badge>
+          </div>
+        </div>
+      }
+    </div>
+
+    <app-pager [page]="page()" [totalPages]="totalPages()" [totalCount]="totalCount()" (pageChange)="onPageChange($event)"></app-pager>
+  }
+</div>

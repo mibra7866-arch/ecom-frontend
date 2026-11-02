@@ -1,0 +1,72 @@
+<div class="order-picker">
+  <header class="order-picker__header">
+    <div>
+      <h2>Create Order</h2>
+      <p>Pick a product from the catalog to create a new order.</p>
+    </div>
+    <button type="button" class="order-picker__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="order-picker__search">
+    <mat-icon>search</mat-icon>
+    <input type="text" placeholder="Search products by name..." [value]="search()" (input)="onSearchInput($any($event.target).value)" />
+  </div>
+
+  <div class="order-picker__body">
+    @if (errorMessage()) {
+      <div class="order-picker__error">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="order-picker__state">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Loading catalog…</p>
+      </div>
+    } @else if (items().length === 0) {
+      <div class="order-picker__state">
+        <mat-icon>search_off</mat-icon>
+        <p>No products match your search.</p>
+      </div>
+    } @else {
+      <div class="order-picker__grid">
+        @for (item of items(); track item.id) {
+          <div class="order-picker__card">
+            @if (item.imageUrl) {
+              <img class="order-picker__thumb" [src]="fileUrl(item.imageUrl)" [alt]="item.name" />
+            } @else {
+              <div class="order-picker__thumb order-picker__thumb--placeholder">
+                <mat-icon>image</mat-icon>
+              </div>
+            }
+
+            <h3 class="order-picker__title">{{ item.name }}</h3>
+
+            <div class="order-picker__prices">
+              <span class="order-picker__price">{{ formatCurrency(item.price) }}</span>
+              <span class="order-picker__commission">
+                <mat-icon>arrow_upward</mat-icon>
+                {{ formatCurrency(item.profit) }}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="order-picker__action"
+              [disabled]="creatingId() !== null"
+              (click)="createOrder(item)"
+            >
+              {{ creatingId() === item.id ? 'Creating…' : 'Create Order' }}
+            </button>
+          </div>
+        }
+      </div>
+
+      <app-pager [page]="page()" [totalPages]="totalPages()" [totalCount]="totalCount()" (pageChange)="onPageChange($event)"></app-pager>
+    }
+  </div>
+</div>

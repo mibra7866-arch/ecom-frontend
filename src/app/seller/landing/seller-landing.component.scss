@@ -1,0 +1,100 @@
+.landing {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(99, 102, 241, 0.1), transparent 45%),
+    var(--ecom-bg);
+  color: var(--ecom-text);
+  // Base gutter framing the whole page on every side — the nav/hero/features sections below still
+  // add their own (larger) padding on top of this, reusing the same 24px already used for their
+  // side padding rather than introducing a new value.
+  padding: 24px;
+}
+
+.landing__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 48px;
+}
+
+.landing__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+
+  mat-icon {
+    color: var(--ecom-indigo);
+  }
+}
+
+.landing__nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.landing__hero {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 44px 24px 36px;
+
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 12px;
+  }
+
+  p {
+    color: var(--ecom-text-muted);
+    font-size: 1.05rem;
+    margin: 0 0 24px;
+  }
+}
+
+.hero-cta {
+  height: 48px;
+  padding: 0 28px;
+
+  mat-icon {
+    margin-left: 4px;
+  }
+}
+
+.landing__features {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.feature-card {
+  background: var(--ecom-surface);
+  border: 1px solid var(--ecom-border);
+  border-radius: var(--ecom-radius);
+  padding: 18px;
+
+  mat-icon {
+    color: var(--ecom-indigo);
+    font-size: 26px;
+    height: 26px;
+    width: 26px;
+    margin-bottom: 8px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ecom-text-muted);
+    font-size: 0.9rem;
+  }
+}

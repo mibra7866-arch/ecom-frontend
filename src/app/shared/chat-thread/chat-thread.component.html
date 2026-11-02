@@ -1,0 +1,91 @@
+<div class="chat-thread">
+  <header class="chat-thread__header">
+    <div class="chat-thread__counterpart">
+      <span class="chat-thread__presence-dot" [class.chat-thread__presence-dot--online]="presence()?.isOnline"></span>
+      <span>{{ counterpartLabel }}</span>
+    </div>
+    @if (isReconnecting()) {
+      <span class="chat-thread__reconnecting">
+        <span class="chat-thread__spinner"></span>
+        Reconnecting…
+      </span>
+    }
+    <button type="button" class="chat-thread__delete" (click)="deleteChat()" aria-label="Delete conversation" title="Delete conversation">
+      <mat-icon>delete_outline</mat-icon>
+    </button>
+  </header>
+
+  <div class="chat-thread__scroll" #scrollContainer>
+    @if (loadingHistory()) {
+      <div class="chat-thread__history-loading">
+        <span class="chat-thread__spinner"></span>
+      </div>
+    }
+
+    @if (messages().length === 0 && !loadingHistory()) {
+      <div class="chat-thread__empty">
+        <mat-icon>forum</mat-icon>
+        <p>No messages yet — say hello.</p>
+      </div>
+    }
+
+    @for (message of messages(); track message.clientId ?? message.id) {
+      <app-chat-bubble
+        [content]="message.content"
+        [attachmentUrl]="message.attachmentUrl"
+        [sentAtUtc]="message.sentAtUtc"
+        [editedAtUtc]="message.editedAtUtc"
+        [mine]="isMine(message.senderType)"
+        [tickState]="isMine(message.senderType) ? tickState(message) : undefined"
+        [actionable]="canManage(message)"
+        (editMessage)="editMessage(message, $event)"
+        (deleteMessage)="deleteMessage(message)"
+      ></app-chat-bubble>
+    }
+  </div>
+
+  @if (attachmentError()) {
+    <div class="chat-thread__attachment-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ attachmentError() }}</span>
+    </div>
+  }
+
+  @if (pendingFile(); as file) {
+    <div class="chat-thread__attachment-preview">
+      @if (pendingFileIsImage() && pendingFilePreviewUrl(); as previewUrl) {
+        <img [src]="previewUrl" alt="Selected image" />
+      } @else {
+        <div class="chat-thread__attachment-file">
+          <mat-icon>description</mat-icon>
+          <span>{{ file.name }}</span>
+        </div>
+      }
+      <button type="button" class="chat-thread__attachment-remove" (click)="removeAttachment()" aria-label="Remove attachment">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  }
+
+  <div class="chat-thread__composer">
+    <input type="file" #fileInput hidden accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" (change)="onFileSelected($event)" />
+    <button type="button" class="chat-thread__attach" (click)="fileInput.click()" [disabled]="sending()" aria-label="Attach file" title="Attach file">
+      <mat-icon>attach_file</mat-icon>
+    </button>
+    <textarea
+      #draftInput
+      rows="1"
+      placeholder="Type a message…"
+      [value]="draft()"
+      (input)="onDraftInput($event)"
+      (keydown)="onComposerKeydown($event)"
+      (keyup)="onComposerKeyup($event)"
+      (beforeinput)="onComposerBeforeInput($event)"
+      (paste)="onPaste($event)"
+      maxlength="2000"
+    ></textarea>
+    <button type="button" class="chat-thread__send" [disabled]="(!draft().trim() && !pendingFile()) || sending()" (click)="send()">
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
+</div>

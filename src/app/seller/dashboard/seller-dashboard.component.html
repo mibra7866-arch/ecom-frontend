@@ -1,0 +1,193 @@
+@if (loading()) {
+  <div class="state state--loading">
+    <span class="spinner"></span>
+    <p>Loading your dashboard…</p>
+  </div>
+} @else if (errorMessage()) {
+  <div class="state state--error">
+    <mat-icon>error</mat-icon>
+    <p>{{ errorMessage() }}</p>
+    <button type="button" class="retry-btn" (click)="load()">Retry</button>
+  </div>
+} @else if (summary(); as s) {
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <span class="dashboard-header__icon"><mat-icon>grid_view</mat-icon></span>
+      <div>
+        <h1>Dashboard</h1>
+        <p class="dashboard-header__subtext">Your shop at a glance</p>
+      </div>
+    </div>
+
+    @if (s.sellerStatus !== 'Active') {
+      <app-kyc-status-banner></app-kyc-status-banner>
+    }
+
+    <!-- Welcome banner -->
+    <section class="banner">
+      <div class="banner__left">
+        <div class="banner__avatar-row">
+          <div class="banner__avatar">
+            {{ initial() }}
+            <span class="banner__avatar-dot"></span>
+          </div>
+        </div>
+        <span class="banner__eyebrow">WELCOME BACK</span>
+        <h1 class="banner__name">{{ s.storeName }} <app-verified-badge [verified]="isVerified()"></app-verified-badge></h1>
+        <div class="banner__rating-credit">
+          <app-star-rating [rating]="rating()"></app-star-rating>
+          <span class="banner__dot">•</span>
+          <span class="banner__credit-score">Credit Score: {{ creditScore() }}</span>
+        </div>
+        <div class="banner__meta">
+          <span>{{ s.totalOrders }} orders all-time</span>
+          @if (s.isBoosted) {
+            <span class="banner__dot">•</span>
+            <span class="banner__rating"><mat-icon>trending_up</mat-icon>Promoted</span>
+          }
+        </div>
+        <div class="banner__actions">
+          <button type="button" class="banner__btn" (click)="goToProducts()"><mat-icon>add</mat-icon>Add product</button>
+          <button type="button" class="banner__btn" (click)="goToOrders()"><mat-icon>shopping_cart</mat-icon>View orders</button>
+          <button type="button" class="banner__btn" (click)="goToWithdraw()"><mat-icon>north_east</mat-icon>Withdraw</button>
+          <button type="button" class="banner__btn" (click)="openTopUpModal()"><mat-icon>account_balance_wallet</mat-icon>Top Up</button>
+        </div>
+      </div>
+
+      <div class="banner__right">
+        <div class="banner__stat">
+          <span class="banner__stat-label">BALANCE</span>
+          <span class="banner__stat-value">{{ formatCurrency(s.balance) }}</span>
+        </div>
+        <div class="banner__stat">
+          <span class="banner__stat-label">GUARANTEE</span>
+          <span class="banner__stat-value">{{ formatCurrency(s.guaranteeBalance) }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 summary cards -->
+    <section class="summary-row">
+      <div class="summary-card summary-card--blue">
+        <div class="summary-card__icon"><mat-icon>attach_money</mat-icon></div>
+        <div class="summary-card__text">
+          <span class="summary-card__label">TOTAL REVENUE</span>
+          <span class="summary-card__value">{{ formatCurrency(s.salesStats.totalRevenue) }}</span>
+        </div>
+      </div>
+      <div class="summary-card summary-card--green">
+        <div class="summary-card__icon"><mat-icon>trending_up</mat-icon></div>
+        <div class="summary-card__text">
+          <span class="summary-card__label">TOTAL PROFIT</span>
+          <span class="summary-card__value">{{ formatCurrency(s.salesStats.totalProfit) }}</span>
+        </div>
+      </div>
+      <div class="summary-card summary-card--purple">
+        <div class="summary-card__icon"><mat-icon>shopping_cart</mat-icon></div>
+        <div class="summary-card__text">
+          <span class="summary-card__label">TOTAL ORDERS</span>
+          <span class="summary-card__value">{{ s.totalOrders }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 small stat cards -->
+    <section class="tile-row">
+      <div class="tile">
+        <div class="tile__icon tile__icon--blue"><mat-icon>visibility</mat-icon></div>
+        <span class="tile__value">{{ s.totalViews }}</span>
+        <span class="tile__label">Total Views</span>
+      </div>
+      <div class="tile">
+        <div class="tile__icon tile__icon--green"><mat-icon>visibility</mat-icon></div>
+        <span class="tile__value">{{ s.todayViews }}</span>
+        <span class="tile__label">Today Views</span>
+      </div>
+      <div class="tile">
+        <div class="tile__icon tile__icon--orange"><mat-icon>schedule</mat-icon></div>
+        <span class="tile__value">{{ s.pendingOrders }}</span>
+        <span class="tile__label">Pending</span>
+      </div>
+      <div class="tile">
+        <div class="tile__icon tile__icon--green"><mat-icon>inventory_2</mat-icon></div>
+        <span class="tile__value">{{ s.deliveredOrders }}</span>
+        <span class="tile__label">Completed</span>
+      </div>
+      <div class="tile">
+        <div class="tile__icon tile__icon--gray"><mat-icon>widgets</mat-icon></div>
+        <span class="tile__value">{{ s.totalProducts }} / {{ s.requiredProductCount }}</span>
+        <span class="tile__label">Products in Store</span>
+      </div>
+      <div class="tile">
+        <div class="tile__icon tile__icon--orange"><mat-icon>calendar_month</mat-icon></div>
+        <span class="tile__value">{{ s.thisMonthOrders }}</span>
+        <span class="tile__label">This Month</span>
+      </div>
+    </section>
+
+    <!-- Sales stats + category breakdown -->
+    <section class="panel-row">
+      <div class="panel panel--sales">
+        <div class="panel__header">
+          <div class="panel__header-title">
+            <mat-icon>bar_chart</mat-icon>
+            <h2>Sales Stats</h2>
+          </div>
+          <span class="panel__badge"><mat-icon>trending_up</mat-icon>{{ s.salesStats.marginPercent }}% margin</span>
+        </div>
+
+        <div class="panel__rows">
+          <div class="panel__row">
+            <span>Total Revenue</span>
+            <span>{{ formatCurrency(s.salesStats.totalRevenue) }}</span>
+          </div>
+          <div class="panel__row">
+            <span>Total Cost</span>
+            <span>{{ formatCurrency(s.salesStats.totalCost) }}</span>
+          </div>
+          <div class="panel__row">
+            <span>Total Profit</span>
+            <span class="panel__row-green">{{ formatCurrency(s.salesStats.totalProfit) }}</span>
+          </div>
+          <div class="panel__row">
+            <span>This Month Revenue</span>
+            <span>{{ formatCurrency(s.salesStats.thisMonthRevenue) }}</span>
+          </div>
+          <div class="panel__row">
+            <span>This Month Profit</span>
+            <span class="panel__row-green">{{ formatCurrency(s.salesStats.thisMonthProfit) }}</span>
+          </div>
+          <div class="panel__row">
+            <span>Avg. Order Value</span>
+            <span>{{ formatCurrency(s.salesStats.avgOrderValue) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel--categories">
+        <div class="panel__header">
+          <div class="panel__header-title">
+            <mat-icon>category</mat-icon>
+            <h2>Products by Category</h2>
+          </div>
+          <span class="panel__muted">{{ s.totalProducts }} total</span>
+        </div>
+
+        <div class="panel__category-list">
+          @for (cat of s.categoryBreakdown; track cat.category; let i = $index) {
+            <div class="category-row">
+              <span class="category-row__left">
+                <span class="category-row__dot" [style.background]="categoryColor(i)"></span>
+                {{ cat.category }}
+              </span>
+              <span class="category-row__right">{{ cat.count }} · {{ cat.percentage }}%</span>
+            </div>
+          } @empty {
+            <p class="panel__empty">No products yet.</p>
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+
+}

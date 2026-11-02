@@ -1,0 +1,29 @@
+<div class="fin-modal">
+  <header class="fin-modal__header">
+    <h2>Shop Rating</h2>
+    <p>{{ data.storeName }} — current rating: <strong>{{ data.currentRating ?? 'Not rated' }}</strong></p>
+  </header>
+
+  <div class="fin-modal__body">
+    <div class="rating-picker">
+      @for (i of stars; track i) {
+        <span class="rating-picker__star">
+          <mat-icon class="rating-picker__icon">{{ icons()[i] }}</mat-icon>
+          <button type="button" class="rating-picker__half rating-picker__half--left" (click)="setStar(i, 'left')" aria-label="Set half star"></button>
+          <button type="button" class="rating-picker__half rating-picker__half--right" (click)="setStar(i, 'right')" aria-label="Set full star"></button>
+        </span>
+      }
+      <span class="rating-picker__value">{{ rating() }}</span>
+    </div>
+
+    <label class="fin-modal__field">
+      <span>Reason</span>
+      <textarea rows="3" placeholder="Why is this rating changing?" [value]="reason()" (input)="reason.set($any($event.target).value)"></textarea>
+    </label>
+  </div>
+
+  <footer class="fin-modal__footer">
+    <button type="button" class="fin-modal__btn fin-modal__btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="fin-modal__btn fin-modal__btn--solid" [disabled]="!canApply()" (click)="apply()">Apply</button>
+  </footer>
+</div>

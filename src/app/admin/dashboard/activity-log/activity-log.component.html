@@ -1,0 +1,24 @@
+<div class="activity-log">
+  <div class="activity-log__header">
+    <h3>Activity</h3>
+    <span class="activity-log__live" [class.activity-log__live--off]="!logsHub.connected()">
+      <span class="activity-log__pulse"></span>
+      {{ logsHub.connected() ? 'LIVE' : 'Connecting…' }}
+    </span>
+  </div>
+
+  <div class="activity-log__list">
+    @if (logsHub.events().length === 0) {
+      <p class="activity-log__empty">No activity yet. New events will appear here in real time.</p>
+    }
+    @for (event of logsHub.events(); track event.id) {
+      <div class="activity-log__item">
+        <mat-icon>bolt</mat-icon>
+        <div class="activity-log__item-body">
+          <p class="activity-log__action">{{ event.action }}</p>
+          <p class="activity-log__meta">{{ event.actorType }} · {{ event.createdAt | date: 'short' }}</p>
+        </div>
+      </div>
+    }
+  </div>
+</div>

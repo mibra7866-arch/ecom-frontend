@@ -1,0 +1,144 @@
+<div class="list-page scroll-fixed">
+  <div class="list-page__header">
+    <h1>KYC Review Queue</h1>
+  </div>
+
+  <div class="kyc-review__filters-row">
+    <mat-button-toggle-group [value]="statusFilter()" (change)="setStatusFilter($event.value)">
+      <mat-button-toggle [value]="null">All</mat-button-toggle>
+      @for (status of statuses; track status) {
+        <mat-button-toggle [value]="status">{{ statusLabel(status) }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+
+    <app-results-pill [count]="totalCount()"></app-results-pill>
+
+    <div class="kyc-review__search">
+      <mat-icon>search</mat-icon>
+      <input type="text" placeholder="Search by name..." [value]="search()" (input)="onSearchInput($any($event.target).value)" />
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="list-page__loading">
+      <mat-spinner diameter="28"></mat-spinner>
+    </div>
+  } @else {
+    <div class="list-page__table-wrap">
+      <div class="scroll-area">
+      <table mat-table [dataSource]="submissions()" class="list-table">
+        <ng-container matColumnDef="sellerName">
+          <th mat-header-cell *matHeaderCellDef>Seller</th>
+          <td mat-cell *matCellDef="let s">{{ s.sellerName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="documents">
+          <th mat-header-cell *matHeaderCellDef>Documents</th>
+          <td mat-cell *matCellDef="let s">
+            <div class="kyc-documents">
+              @for (url of s.documentUrls; track url; let i = $index) {
+                @if (isImageDocument(url)) {
+                  <button type="button" class="kyc-documents__link" (click)="openDocument(url, 'Document ' + (i + 1))">
+                    <mat-icon>description</mat-icon>
+                    Document {{ i + 1 }}
+                  </button>
+                } @else {
+                  <a [href]="fileUrl(url)" target="_blank" rel="noopener" class="kyc-documents__link">
+                    <mat-icon>description</mat-icon>
+                    Document {{ i + 1 }}
+                  </a>
+                }
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let s"><app-status-badge [status]="s.status"></app-status-badge></td>
+        </ng-container>
+
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef>Submitted</th>
+          <td mat-cell *matCellDef="let s">{{ s.createdAt | date: 'mediumDate' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let s">
+            @if (s.status === 'AwaitingVerification') {
+              <button mat-button color="primary" [disabled]="processingId() !== null" (click)="approve(s)">
+                {{ processingId() === s.id ? 'Approving…' : 'Approve' }}
+              </button>
+              <button mat-button [disabled]="processingId() !== null" (click)="reject(s)">Reject</button>
+            }
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+
+      @if (submissions().length === 0) {
+        <p class="list-page__empty">{{ emptyMessage() }}</p>
+      }
+      </div>
+
+      <div class="list-cards">
+        @for (s of submissions(); track s.id) {
+          <div class="list-card">
+            <div class="list-card__header">
+              <span>{{ s.sellerName }}</span>
+              <app-status-badge [status]="s.status"></app-status-badge>
+            </div>
+            <div class="list-card__row">
+              <span class="list-card__label">Submitted</span>
+              <span class="list-card__value">{{ s.createdAt | date: 'mediumDate' }}</span>
+            </div>
+            @if (s.status === 'Rejected' && s.rejectionReason) {
+              <div class="list-card__row">
+                <span class="list-card__label">Reason</span>
+                <span class="list-card__value">{{ s.rejectionReason }}</span>
+              </div>
+            }
+            <div class="kyc-documents">
+              @for (url of s.documentUrls; track url; let i = $index) {
+                @if (isImageDocument(url)) {
+                  <button type="button" class="kyc-documents__link" (click)="openDocument(url, 'Document ' + (i + 1))">
+                    <mat-icon>description</mat-icon>
+                    Document {{ i + 1 }}
+                  </button>
+                } @else {
+                  <a [href]="fileUrl(url)" target="_blank" rel="noopener" class="kyc-documents__link">
+                    <mat-icon>description</mat-icon>
+                    Document {{ i + 1 }}
+                  </a>
+                }
+              }
+            </div>
+            @if (s.status === 'AwaitingVerification') {
+              <div class="list-card__actions">
+                <button mat-button color="primary" [disabled]="processingId() !== null" (click)="approve(s)">
+                  {{ processingId() === s.id ? 'Approving…' : 'Approve' }}
+                </button>
+                <button mat-button [disabled]="processingId() !== null" (click)="reject(s)">Reject</button>
+              </div>
+            }
+          </div>
+        }
+        @if (submissions().length === 0) {
+          <p class="list-page__empty">{{ emptyMessage() }}</p>
+        }
+      </div>
+    </div>
+
+    <app-pager [page]="page()" [totalPages]="totalPages()" [totalCount]="totalCount()" (pageChange)="onPageChange($event)"></app-pager>
+  }
+</div>

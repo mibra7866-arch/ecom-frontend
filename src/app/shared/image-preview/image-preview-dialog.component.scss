@@ -1,0 +1,110 @@
+// The panel itself is stripped to transparent (see .image-preview-panel in styles.scss) so this is
+// the only surface the user sees — a full image floating over the dimmed backdrop, closed by clicking
+// anywhere outside the image, the close button, or Escape (MatDialog's own default).
+@use '../styles/breakpoints' as bp;
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.image-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  cursor: zoom-out;
+}
+
+// Shrink-wraps to the <img>'s own rendered box (inline-flex with a single child does this) rather than
+// filling the viewport, so .image-preview__close — positioned relative to THIS element — anchors to
+// the image's actual top-right corner regardless of its aspect ratio, instead of always sitting at the
+// page's fixed top-right corner. min-width/height give the loading spinner below a sane box to center
+// in before the image's real intrinsic size is known.
+.image-preview__frame {
+  position: relative;
+  display: inline-flex;
+  min-width: 120px;
+  min-height: 120px;
+  max-width: 95vw;
+  max-height: 95vh;
+}
+
+.image-preview__img {
+  display: block;
+  max-width: 95vw;
+  max-height: 95vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  // The dialog itself opens instantly; this just avoids a hard "pop" once the (possibly large,
+  // over-the-network) photo finishes loading, in favor of a quick fade once the spinner clears.
+  opacity: 0;
+  transition: opacity 0.15s ease;
+
+  &--loaded {
+    opacity: 1;
+  }
+}
+
+.image-preview__spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #ffffff;
+  animation: image-preview-spin 0.7s linear infinite;
+}
+
+@keyframes image-preview-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.image-preview__close {
+  // Inset under the photo's own top-right corner (not straddling/overlapping outside its edge) —
+  // same position on every width now, so this no longer needs a separate mobile override to avoid
+  // clipping off-screen the way the old overlapping treatment did.
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(15, 20, 32, 0.92);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+
+  // Material's close glyph is a single-weight icon font — font-weight has no effect on it, so a
+  // doubled-up text-shadow is what actually thickens its stroke to read as bold.
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    text-shadow:
+      0 0 1px currentColor,
+      0 0 1px currentColor;
+  }
+
+  &:hover {
+    background: rgba(15, 20, 32, 1);
+  }
+
+  @include bp.mobile {
+    width: 36px;
+    height: 36px;
+  }
+}

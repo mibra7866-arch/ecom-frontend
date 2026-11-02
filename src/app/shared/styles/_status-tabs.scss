@@ -1,0 +1,131 @@
+@use '@angular/material' as mat;
+
+// Shared "dark blue" filled mat-button-toggle-group — originally built for Sellers and KYC Review's
+// status filters (both had the identical override block copy-pasted), now also used by Top-Up/
+// Withdrawal's status filters and the seller Top Up flow's Bank/E Vault selector, so every admin/seller
+// filter toggle reuses this one definition instead of five copies of the same override block.
+@mixin dark-blue-toggle-group {
+  // The group doesn't wrap its own buttons internally — a horizontally-scrollable strip is the
+  // standard mobile pattern for a filter bar that doesn't fit, rather than cramming everything into a
+  // narrow width or truncating labels differently from desktop.
+  max-width: 100%;
+  overflow-x: auto;
+
+  background: linear-gradient(135deg, #1e3a8a, #0c1e3f);
+  border-radius: 8px;
+
+  @include mat.button-toggle-overrides(
+    (
+      text-color: #ffffff,
+      selected-state-text-color: #ffffff,
+      disabled-state-text-color: rgba(255, 255, 255, 0.5),
+      selected-state-background-color: rgba(59, 130, 246, 0.45),
+    )
+  );
+
+  mat-button-toggle {
+    font-weight: 600;
+  }
+}
+
+// Shared "outlined pill" status-filter row — originally built for the seller Orders list
+// (seller-orders-list.component.scss) and reused verbatim by the admin seller-orders-dialog, since both
+// need the identical filter-pill design. Each tab is its own outlined pill sitting directly on the
+// surface behind it — not a segmented control sharing one bar background — with only the active tab
+// getting a visible border, and a transparent (rather than added/removed) border so every pill stays the
+// same size and the row never jumps horizontally when the active tab changes.
+@mixin status-tabs-pills {
+  .orders-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+
+    // Scrollbar visually disappears rather than reserving space, so a phone-width row that needs to
+    // scroll still reads as a clean pill row, not an obviously scrollable list.
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .orders-tabs__pill {
+    display: flex;
+    align-items: center;
+    flex: none;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    border: 1.5px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ecom-text-muted);
+    font-size: 0.84rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      color: var(--ecom-text);
+    }
+
+    &--active {
+      border-color: var(--ecom-text);
+      color: var(--ecom-text);
+      font-weight: 700;
+    }
+  }
+
+  .orders-tabs__dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ecom-text-muted);
+
+    &--all {
+      background: var(--ecom-text-muted);
+    }
+
+    &--unpaid {
+      background: var(--ecom-red);
+    }
+
+    &--paid {
+      background: var(--ecom-blue);
+    }
+
+    &--pickup {
+      background: var(--ecom-amber);
+    }
+
+    &--on-the-way {
+      background: var(--ecom-indigo);
+    }
+
+    &--out-for-delivery {
+      background: var(--ecom-indigo-dim);
+    }
+
+    &--delivered {
+      background: var(--ecom-green);
+    }
+
+    &--cancelled {
+      background: var(--ecom-text-muted);
+    }
+  }
+
+  .orders-tabs__count {
+    min-width: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--ecom-surface-alt);
+    color: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-align: center;
+  }
+}

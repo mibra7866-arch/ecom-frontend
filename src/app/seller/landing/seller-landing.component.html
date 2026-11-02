@@ -1,0 +1,31 @@
+<div class="landing">
+  <header class="landing__nav">
+    <div class="landing__brand">
+      <mat-icon>storefront</mat-icon>
+      <span>MyESellerStore</span>
+    </div>
+    <div class="landing__nav-actions">
+      <a mat-button routerLink="/seller/login">Sign in</a>
+      <a mat-flat-button color="primary" routerLink="/seller/signup">Register a Store</a>
+    </div>
+  </header>
+
+  <section class="landing__hero">
+    <h1>Launch your dropshipping store without touching inventory</h1>
+    <p>MyESellerStore handles fulfillment, delivery and support so you can focus on growing sales.</p>
+    <a mat-flat-button color="primary" class="hero-cta" routerLink="/seller/signup">
+      Get started
+      <mat-icon>arrow_forward</mat-icon>
+    </a>
+  </section>
+
+  <section class="landing__features">
+    @for (feature of features; track feature.title) {
+      <div class="feature-card">
+        <mat-icon>{{ feature.icon }}</mat-icon>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.text }}</p>
+      </div>
+    }
+  </section>
+</div>

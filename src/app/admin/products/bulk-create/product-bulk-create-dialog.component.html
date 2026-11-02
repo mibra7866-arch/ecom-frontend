@@ -1,0 +1,117 @@
+<div class="bank-modal bulk-create">
+  <header class="bank-modal__header">
+    <h2>Add Multiple Products</h2>
+    <p>Select up to {{ maxProducts }} images — each becomes one product with its own price and profit.</p>
+  </header>
+
+  <div class="bank-modal__body bulk-create__body">
+    @if (errorMessage()) {
+      <div class="product-form__error">{{ errorMessage() }}</div>
+    }
+
+    @if (canAddMore()) {
+      <app-file-upload
+        [files]="[]"
+        [multiple]="true"
+        accept="image/*"
+        [hint]="'Any image, up to 5 MB each — ' + rows().length + ' of ' + maxProducts + ' selected'"
+        theme="light"
+        [dense]="true"
+        (filesSelected)="onFilesSelected($event)"
+      ></app-file-upload>
+    } @else {
+      <p class="bulk-create__limit-note">
+        <mat-icon>info</mat-icon>
+        You've selected the maximum of {{ maxProducts }} images. Remove one to add another.
+      </p>
+    }
+
+    @if (rows().length === 0) {
+      <p class="bulk-create__empty">No images selected yet — browse or drop up to {{ maxProducts }} above to get started.</p>
+    } @else {
+      <div class="bulk-create__rows">
+        @for (row of rows(); track row.id; let i = $index) {
+          <div class="bulk-create__row">
+            <div class="bulk-create__row-main">
+              <img class="bulk-create__thumb" [src]="row.previewUrl" [alt]="row.name" (click)="openImage($event, row)" />
+
+              <div class="bulk-create__row-fields">
+                <div class="bulk-create__row-header">
+                  <span class="bulk-create__row-label">Product {{ i + 1 }}</span>
+                  <button type="button" class="bulk-create__remove" (click)="removeRow(row.id)" aria-label="Remove image">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+
+                <label class="bank-modal__field">
+                  <span>Product name</span>
+                  <input type="text" [(ngModel)]="row.name" [name]="'name-' + row.id" />
+                  @if (submitted() && !row.name.trim()) {
+                    <span class="bank-modal__error">Product name is required</span>
+                  }
+                </label>
+
+                <div class="product-form__row">
+                  <label class="bank-modal__field">
+                    <span>Price</span>
+                    <input type="number" min="0.01" step="0.01" [(ngModel)]="row.price" [name]="'price-' + row.id" />
+                    @if (submitted() && (row.price === null || row.price <= 0)) {
+                      <span class="bank-modal__error">Enter a positive price</span>
+                    }
+                  </label>
+
+                  <label class="bank-modal__field">
+                    <span>Profit</span>
+                    <input type="number" step="0.01" [(ngModel)]="row.profit" [name]="'profit-' + row.id" />
+                    @if (submitted() && row.profit === null) {
+                      <span class="bank-modal__error">Profit is required</span>
+                    }
+                  </label>
+                </div>
+
+                <label class="bank-modal__field">
+                  <span>Description</span>
+                  <textarea rows="1" [(ngModel)]="row.description" [name]="'description-' + row.id" placeholder="Optional"></textarea>
+                </label>
+
+                <label class="bank-modal__field">
+                  <span>Category <span class="bank-modal__optional">(optional)</span></span>
+                  <input
+                    type="text"
+                    [(ngModel)]="row.category"
+                    [name]="'category-' + row.id"
+                    list="bulk-create-categories"
+                    placeholder="e.g. Home & Kitchen"
+                  />
+                </label>
+
+                @if (submitted() && isDuplicateName(row)) {
+                  <span class="bank-modal__error">Another product in this batch already uses this name</span>
+                }
+              </div>
+            </div>
+
+            @if (row.error) {
+              <div class="product-form__error bulk-create__row-error">{{ row.error }}</div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <datalist id="bulk-create-categories">
+    @for (cat of categoryOptions(); track cat) {
+      <option [value]="cat"></option>
+    }
+  </datalist>
+
+  <footer class="bank-modal__footer">
+    <button type="button" class="bank-modal__btn bank-modal__btn--ghost" [disabled]="saving()" (click)="cancel()">
+      {{ anyCreated() ? 'Done' : 'Cancel' }}
+    </button>
+    <button type="button" class="bank-modal__btn bank-modal__btn--solid" [disabled]="!canAttemptSave()" (click)="save()">
+      {{ saving() ? 'Saving…' : 'Add ' + rows().length + ' Product' + (rows().length === 1 ? '' : 's') }}
+    </button>
+  </footer>
+</div>

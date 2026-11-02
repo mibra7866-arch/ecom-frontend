@@ -1,0 +1,359 @@
+// Same token language as WithdrawalDetailDialogComponent/AdminTopUpDetailDialogComponent — one
+// detail-dialog design across the app's "review something about an entity" screens.
+:host {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+}
+
+.seller-detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 90vh;
+}
+
+.seller-detail__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 16px;
+  flex: none;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--ecom-text-muted);
+  }
+}
+
+.seller-detail__close {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+  }
+}
+
+.seller-detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 28px 24px;
+  overflow-y: auto;
+}
+
+.error-banner {
+  margin: 0;
+}
+
+.seller-detail__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ecom-border);
+
+  &:first-child {
+    padding-top: 0;
+    border-top: none;
+  }
+}
+
+.seller-detail__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+}
+
+.seller-detail__link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  color: var(--ecom-indigo);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.seller-detail__grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin: 0;
+
+  dt {
+    font-size: 0.78rem;
+    color: var(--ecom-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--ecom-text);
+    font-weight: 500;
+  }
+}
+
+.seller-detail__empty {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ecom-text-muted);
+  font-style: italic;
+}
+
+.kyc-documents {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kyc-documents__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--ecom-indigo);
+  font-size: 0.85rem;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  width: fit-content;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  mat-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+  }
+}
+
+.kyc-documents__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kyc-documents__uploader {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ecom-text-muted);
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--ecom-surface-alt);
+  border: 1px solid var(--ecom-border);
+}
+
+.kyc-documents__delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-left: auto;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--ecom-red);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.kyc-reject-reason {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  font-size: 0.82rem;
+
+  strong {
+    color: var(--ecom-text);
+  }
+
+  span {
+    color: var(--ecom-text-muted);
+  }
+}
+
+.kyc-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--ecom-border);
+}
+
+.kyc-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--ecom-border);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.kyc-history-list__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kyc-history-list__date,
+.kyc-history-list__meta {
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+}
+
+.seller-detail__kyc-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.seller-detail__btn {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.seller-detail__btn--green {
+  background: var(--ecom-green);
+  color: #0b0f19;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+}
+
+.seller-detail__btn--outline-red {
+  background: none;
+  border: 1px solid var(--ecom-red);
+  color: var(--ecom-red);
+
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.12);
+  }
+}
+
+.seller-detail__subheading {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ecom-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.seller-detail__activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--ecom-border);
+    font-size: 0.82rem;
+    color: var(--ecom-text);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}

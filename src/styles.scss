@@ -1,0 +1,536 @@
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+@use 'app/shared/styles/breakpoints' as bp;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$violet-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  // Brand overrides layered on top of Material's system tokens so every
+  // Material component (cards, sidenav, buttons) inherits the same light
+  // gray/indigo palette used by our own custom components below.
+  --mat-sys-surface: #ffffff;
+  --mat-sys-surface-dim: #f1f5f9;
+  --mat-sys-surface-bright: #ffffff;
+  --mat-sys-surface-container-lowest: #ffffff;
+  --mat-sys-surface-container-low: #f8fafc;
+  --mat-sys-surface-container: #f1f5f9;
+  --mat-sys-surface-container-high: #e2e8f0;
+  --mat-sys-surface-container-highest: #e2e8f0;
+  --mat-sys-on-surface: #0f172a;
+  --mat-sys-on-surface-variant: #64748b;
+  --mat-sys-primary: #6366f1;
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: #e0e7ff;
+  --mat-sys-on-primary-container: #3730a3;
+  --mat-sys-outline: rgba(15, 23, 42, 0.14);
+  --mat-sys-outline-variant: rgba(15, 23, 42, 0.08);
+
+  // Brand tokens for our own components (not part of Material's system).
+  --ecom-bg: #f1f5f9;
+  --ecom-surface: #ffffff;
+  --ecom-surface-alt: #f8fafc;
+  --ecom-border: rgba(15, 23, 42, 0.09);
+  --ecom-indigo: #6366f1;
+  --ecom-indigo-dim: #4338ca;
+  --ecom-blue: #3b82f6;
+  --ecom-amber: #f59e0b;
+  --ecom-green: #22c55e;
+  --ecom-red: #ef4444;
+  --ecom-text: #0f172a;
+  --ecom-text-muted: #64748b;
+  --ecom-radius: 16px;
+  --ecom-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+// Self-hosted (not loaded from fonts.googleapis.com/fonts.gstatic.com) so <mat-icon> never falls
+// back to rendering its ligature name as literal text next to a button's label — the "duplicate
+// text on buttons" bug — when the CDN is blocked, slow, or offline. font-display: block holds icon
+// paint briefly rather than flashing raw ligature text before the font arrives.
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/fonts/material-icons.woff2') format('woff2');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  // Default the application to a light color theme to match the brand palette.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--ecom-bg);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+
+  // Only the bottom inset is needed at this level — the app's fixed/edge-anchored chrome (mobile
+  // nav topbars, drawers) applies its own left/right/top insets locally where it actually sits
+  // against a screen edge; nothing else in the page is edge-anchored, so a blanket inset here would
+  // just be dead weight. Falls back to 0 harmlessly on devices with no notch/home-indicator.
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+// Global mobile scroll-responsiveness fix, covering every scroll region in both the admin and seller
+// portals in one place rather than repeating it per component. -webkit-overflow-scrolling enables true
+// momentum scrolling on older iOS/WebKit — without it a touch-scroll region can feel like it needs a
+// few swipes before it actually "catches" and starts moving, which is the exact symptom this fixes.
+// overscroll-behavior stops one scroll region's own rubber-banding at its edges (a modal body, a list
+// panel, ...) from chaining into whatever sits behind it, which otherwise reads as the same kind of
+// stuck/unresponsive scroll. Both properties are no-ops on an element that isn't actually scrollable,
+// so applying them this broadly is safe. html/body are excluded so the page's own native
+// pull-to-refresh/bounce at the very top level is untouched — this only affects scrolling *within* the
+// app's own panels, not the browser chrome around it.
+*:not(html):not(body) {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+// Shared layout for admin list/detail screens (sellers, kyc, orders,
+// withdrawals, support) so each feature component doesn't repeat this CSS.
+.list-page {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  h1 {
+    margin: 0;
+    // Was 1.4rem — noticeably smaller than the seller portal's own page titles (1.9rem for the
+    // equivalent role), an unexplained scale gap between the two dashboards. Bumped for a
+    // consistent, prominent page-title standard across both portals.
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+}
+
+.list-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list-page__loading {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+// Shared inline failure banner for any screen that needs to surface an API error
+// (list loads, admin actions like approve/reject) instead of failing silently.
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--ecom-red);
+  font-size: 0.85rem;
+}
+
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: var(--ecom-green);
+  font-size: 0.85rem;
+}
+
+.list-page__table-wrap {
+  background: var(--ecom-surface);
+  border: 1px solid var(--ecom-border);
+  border-radius: var(--ecom-radius);
+  box-shadow: var(--ecom-shadow);
+  overflow: hidden;
+}
+
+// Generic pair for any list-style page that shouldn't scroll as a whole — deliberately not scoped
+// to .list-page's naming, since some pages (seller top-up/withdraw) use their own .requests-page
+// root instead. Add .scroll-fixed alongside the page's own root class (which must already be
+// display:flex; flex-direction:column, as .list-page and .requests-page both are): it makes the
+// page fill the shell's viewport height exactly, so .shell__content's own overflow-y:auto never has
+// anything to scroll. Add .scroll-area to whatever needs to scroll internally — a table, a card
+// grid, or a plain row list — and it becomes the sole scrolling region, with everything else in the
+// page (header, filters, pager) staying a fixed flex sibling that never scrolls out of view.
+.scroll-fixed {
+  height: 100%;
+  overflow: hidden;
+}
+
+.scroll-fixed .list-page__table-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.scroll-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+
+  // Plain CSS sticky (rather than CdkTable's sticky:true, which doesn't reliably engage its JS
+  // positioning here) — needs an opaque background matching .list-page__table-wrap's, otherwise
+  // rows scrolled underneath would show through the header. No-op selector when .scroll-area wraps
+  // a card grid or plain row list instead of a <table>.
+  th.mat-mdc-header-cell {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--ecom-surface);
+  }
+}
+
+.list-page__empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--ecom-text-muted);
+  font-size: 0.9rem;
+}
+
+.list-page__filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-table {
+  // Inside .scroll-area (overflow-x:auto), a table with many columns should keep its natural,
+  // legible column widths and let the container scroll horizontally rather than squeeze every
+  // column to fit — width:100% alone would do the latter. min-width:100% still lets it stretch to
+  // fill on wide viewports where nothing needs to scroll.
+  width: max-content;
+  min-width: 100%;
+  background: transparent;
+
+  th.mat-mdc-header-cell {
+    color: var(--ecom-text-muted);
+    font-size: 0.78rem;
+    // Headers need to read as labels for the column below, not blend into the row text — Material's
+    // own default header weight is too close to the body text's.
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-bottom-color: var(--ecom-border);
+  }
+
+  td.mat-mdc-cell {
+    color: var(--ecom-text);
+    font-size: 0.88rem;
+    border-bottom-color: var(--ecom-border);
+  }
+
+  tr.mat-mdc-row:hover {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+// Mobile alternative to .list-table for the admin portal's data-heavy list pages (Sellers, Orders,
+// Withdrawals, Top-Up, KYC, Order Assignment, Order Stages, Invitations) — below the mobile
+// breakpoint, each page hides its <table> and shows a stack of .list-card rows built from the same
+// data instead of scrolling a many-column table sideways. Sticky table headers (th.mat-mdc-header-
+// cell above) are a no-op here since there's no header row in a card stack — nothing to disable,
+// that selector simply doesn't match anything inside the hidden .list-table.
+//
+// The base (hidden) rule must come BEFORE the @include bp.mobile override below — both are the same
+// specificity, so with equal specificity the later source-order rule wins regardless of being inside
+// a @media block, and defining the override first would get silently beaten by this base rule at
+// every matching viewport width.
+.list-cards {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px;
+  // Unlike .list-table's wrapping .scroll-area sibling, this container had no scroll region of its
+  // own — on a .scroll-fixed page (height:100%; overflow:hidden) with enough cards to exceed the
+  // available height, the extra cards were simply clipped by the page's own overflow:hidden with no
+  // way to reach them, not just "needing a scroll". flex:1/min-height:0 let it actually claim (and
+  // correctly shrink to) the remaining space inside .list-page__table-wrap, and overflow-y:auto makes
+  // that space scrollable — same fix .scroll-area already gets, now applied to its mobile counterpart
+  // on every page that uses this pattern (Sellers, Orders, Withdrawals, Top-Up, KYC, Order Assignment,
+  // Order Stages, Invitations).
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+@include bp.mobile {
+  .list-table {
+    display: none;
+  }
+
+  // .scroll-area wrapping a (now-hidden) .list-table still sat in the flex-column .list-page__table-
+  // wrap as a `flex: 1` sibling of .list-cards below it — two flex:1 items split the available height
+  // roughly in half even though the first one had nothing left to show, leaving .list-cards squeezed
+  // into the bottom half with a large blank gap above it. :has() scopes this to only the .scroll-area
+  // that wraps a .list-table (never a page where .scroll-area wraps something else with no .list-cards
+  // counterpart), so it's a targeted fix, not a blanket "hide every .scroll-area on mobile" rule.
+  .scroll-area:has(.list-table) {
+    display: none;
+  }
+
+  .list-cards {
+    display: flex;
+  }
+}
+
+.list-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--ecom-surface);
+  border: 1px solid var(--ecom-border);
+  box-shadow: var(--ecom-shadow);
+}
+
+.list-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--ecom-border);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ecom-text);
+}
+
+.list-card__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
+}
+
+.list-card__label {
+  flex: none;
+  color: var(--ecom-text-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.list-card__value {
+  // Long values (emails, store names) ellipsis rather than force the row to overflow or wrap
+  // awkwardly against the label.
+  min-width: 0;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ecom-text);
+}
+
+.list-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+  margin-top: 4px;
+  border-top: 1px solid var(--ecom-border);
+}
+
+// Seller-facing order status pill (Unpaid/Paid/Pickup/On the way/Out for delivery/Delivered/Cancelled —
+// see shared/utils/seller-order-status.ts), shared verbatim by the Orders list card, the Orders desktop
+// table, and the order detail header so the same order's status looks visually identical no matter
+// which of those three renders it.
+.order-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &--unpaid {
+    background: rgba(239, 68, 68, 0.14);
+    color: var(--ecom-red);
+
+    .order-status-pill__dot {
+      background: var(--ecom-red);
+    }
+  }
+
+  &--paid {
+    background: rgba(59, 130, 246, 0.14);
+    color: var(--ecom-blue);
+
+    .order-status-pill__dot {
+      background: var(--ecom-blue);
+    }
+  }
+
+  &--pickup {
+    background: rgba(245, 158, 11, 0.14);
+    color: var(--ecom-amber);
+
+    .order-status-pill__dot {
+      background: var(--ecom-amber);
+    }
+  }
+
+  &--on-the-way {
+    background: rgba(99, 102, 241, 0.14);
+    color: var(--ecom-indigo);
+
+    .order-status-pill__dot {
+      background: var(--ecom-indigo);
+    }
+  }
+
+  &--out-for-delivery {
+    background: rgba(67, 56, 202, 0.14);
+    color: var(--ecom-indigo-dim);
+
+    .order-status-pill__dot {
+      background: var(--ecom-indigo-dim);
+    }
+  }
+
+  &--delivered {
+    background: rgba(34, 197, 94, 0.14);
+    color: var(--ecom-green);
+
+    .order-status-pill__dot {
+      background: var(--ecom-green);
+    }
+  }
+
+  // Deliberately not red — that already means "Unpaid" (needs action). Cancelled is a dead/inactive
+  // terminal state, not an urgent one, so it gets the same neutral treatment StatusBadgeComponent
+  // already uses as its own default tone.
+  &--cancelled {
+    background: rgba(148, 163, 184, 0.14);
+    color: var(--ecom-text-muted);
+
+    .order-status-pill__dot {
+      background: var(--ecom-text-muted);
+    }
+  }
+}
+
+.order-status-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+}
+
+/* You can add global styles to this file, and also import other style files */
+
+// The Seller Catalog modal (see SellerCatalogModalComponent) owns its own header/filters/body
+// layout and padding, so the default Material dialog surface padding/radius is stripped here —
+// view encapsulation can't reach these CDK-generated wrapper elements from the component's own styles.
+.seller-catalog-dialog-panel .mat-mdc-dialog-container .mdc-dialog__surface {
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+// PreLoginChatDialogComponent (pre-login "Chat with support") owns its own header/body/composer
+// layout — same reasoning as the catalog modal above.
+.pre-login-chat-dialog-panel .mat-mdc-dialog-container .mdc-dialog__surface {
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+// ImagePreviewDialogComponent (click-to-enlarge lightbox) — a full-bleed, background-less surface so
+// only the photo itself (and the dimmed CDK backdrop behind it) is visible, no boxed dialog card.
+.image-preview-panel .mat-mdc-dialog-container .mdc-dialog__surface {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+// The admin shell's nav (AdminShellComponent) never needs to scroll on its own — Material's
+// mat-sidenav wraps its content in .mat-drawer-inner-container with overflow-y: auto by default,
+// which view encapsulation can't reach from admin-shell.component.scss, so it's overridden here.
+//
+// It's also display:block by default, which silently broke .shell__footer's margin-top:auto —
+// that rule only pushes an element to the bottom when its parent is a flex/grid container, so the
+// footer (Sign out) was just sitting after the last nav group instead of pinned to the sidebar's
+// bottom edge. Restoring flex here (matching .shell__sidenav's own flex-column intent) fixes that.
+.shell__sidenav .mat-drawer-inner-container {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+// app-snackbar-top (set via MAT_SNACK_BAR_DEFAULT_OPTIONS.panelClass in app.config.ts) nudges every
+// toast down from the very top edge of the viewport to roughly where the page header sits.
+.app-snackbar-top {
+  margin-top: 96px !important;
+}
+
+// Browser autofill (Chrome/Edge/Safari) paints its own yellow/blue background + black text on
+// autofilled inputs, ignoring our own background/color — most visible on the login pages' dark
+// fields. The inset box-shadow repaints that background as our own surface color, and the huge
+// transition delay stops Chromium from re-applying its background on blur/refocus after autofill.
+// Applies to every plain <input> app-wide (Material's mat-input is one under the hood too), not
+// just login, since the same browser behavior would otherwise hit any autofillable field.
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--ecom-surface) inset !important;
+  box-shadow: 0 0 0 1000px var(--ecom-surface) inset !important;
+  -webkit-text-fill-color: var(--ecom-text) !important;
+  caret-color: var(--ecom-text);
+  transition: background-color 600000s 0s, color 600000s 0s;
+}

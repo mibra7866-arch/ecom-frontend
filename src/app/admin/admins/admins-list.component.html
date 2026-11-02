@@ -1,0 +1,92 @@
+<div class="list-page scroll-fixed">
+  <div class="list-page__header">
+    <h1>Admins</h1>
+    <button mat-flat-button color="primary" (click)="openCreateDialog()">
+      <mat-icon>add</mat-icon>
+      Create Admin
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="list-page__loading">
+      <mat-spinner diameter="28"></mat-spinner>
+    </div>
+  } @else if (!errorMessage()) {
+    <div class="list-page__table-wrap">
+      <div class="scroll-area">
+        <table mat-table [dataSource]="admins()" class="list-table">
+          <ng-container matColumnDef="username">
+            <th mat-header-cell *matHeaderCellDef>Username</th>
+            <td mat-cell *matCellDef="let a">{{ a.username }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="contact">
+            <th mat-header-cell *matHeaderCellDef>Name / Email</th>
+            <td mat-cell *matCellDef="let a">{{ a.name || '—' }} @if (a.email) { <span>&middot; {{ a.email }}</span> }</td>
+          </ng-container>
+
+          <ng-container matColumnDef="invitationCode">
+            <th mat-header-cell *matHeaderCellDef>LLC Code</th>
+            <td mat-cell *matCellDef="let a">
+              <code>{{ a.invitationCode }}</code>
+              <button mat-icon-button (click)="copyCode(a.invitationCode)" aria-label="Copy code">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdDate">
+            <th mat-header-cell *matHeaderCellDef>Created</th>
+            <td mat-cell *matCellDef="let a">{{ a.createdDate | date: 'mediumDate' }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+
+        @if (admins().length === 0) {
+          <p class="list-page__empty">No admins yet.</p>
+        }
+      </div>
+
+      <div class="list-cards">
+        @for (a of admins(); track a.id) {
+          <div class="list-card">
+            <div class="list-card__header">{{ a.username }}</div>
+            <div class="list-card__row">
+              <span class="list-card__label">Name</span>
+              <span class="list-card__value">{{ a.name || '—' }}</span>
+            </div>
+            <div class="list-card__row">
+              <span class="list-card__label">Email</span>
+              <span class="list-card__value">{{ a.email || '—' }}</span>
+            </div>
+            <div class="list-card__row">
+              <span class="list-card__label">LLC code</span>
+              <span class="list-card__value">
+                <code>{{ a.invitationCode }}</code>
+                <button mat-icon-button (click)="copyCode(a.invitationCode)" aria-label="Copy code">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </span>
+            </div>
+            <div class="list-card__row">
+              <span class="list-card__label">Created</span>
+              <span class="list-card__value">{{ a.createdDate | date: 'mediumDate' }}</span>
+            </div>
+          </div>
+        }
+        @if (admins().length === 0) {
+          <p class="list-page__empty">No admins yet.</p>
+        }
+      </div>
+    </div>
+  }
+</div>

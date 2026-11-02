@@ -1,0 +1,25 @@
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star-rating__star {
+  color: var(--ecom-amber);
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.star-rating__value {
+  margin-left: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ecom-text);
+}
+
+.star-rating--empty {
+  font-size: 0.82rem;
+  color: var(--ecom-text-muted);
+  font-style: italic;
+}

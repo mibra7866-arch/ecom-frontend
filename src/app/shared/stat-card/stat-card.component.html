@@ -1,0 +1,15 @@
+<div class="stat-card" [class.stat-card--featured]="featured" [class.stat-card--amber]="accent === 'amber'" [class.stat-card--green]="accent === 'green'">
+  <div class="stat-card__top">
+    <div class="stat-card__icon">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    @if (live) {
+      <span class="stat-card__live">
+        <span class="stat-card__pulse"></span>
+        LIVE
+      </span>
+    }
+  </div>
+  <p class="stat-card__value">{{ value }}</p>
+  <p class="stat-card__label">{{ label }}</p>
+</div>

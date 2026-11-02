@@ -1,0 +1,58 @@
+<div class="list-page scroll-fixed">
+  <div class="list-page__header">
+    <h1>Products</h1>
+
+    <div class="products-list__header-controls">
+      <div class="products-list__search">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search products by name..." [value]="search()" (input)="onSearchInput($any($event.target).value)" />
+      </div>
+
+      <app-results-pill [count]="totalCount()"></app-results-pill>
+
+      <button mat-stroked-button (click)="openBulkCreateDialog()">
+        <mat-icon>playlist_add</mat-icon>
+        Add Multiple
+      </button>
+
+      <button mat-flat-button color="primary" (click)="openAddDialog()">
+        <mat-icon>add</mat-icon>
+        Add Product
+      </button>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="list-page__loading">
+      <mat-spinner diameter="28"></mat-spinner>
+    </div>
+  } @else if (products().length === 0) {
+    <p class="list-page__empty">
+      @if (search()) {
+        No products match "{{ search() }}".
+      } @else {
+        No products yet — click "Add Product" to create your first one.
+      }
+    </p>
+  } @else {
+    <div class="products-list__grid scroll-area">
+      @for (product of products(); track product.id) {
+        <app-product-card
+          [product]="product"
+          (assignOrder)="openAssignDialog($event)"
+          (editProduct)="openEditDialog($event)"
+          (deleteProduct)="confirmDelete($event)"
+        ></app-product-card>
+      }
+    </div>
+
+    <app-pager [page]="page()" [totalPages]="totalPages()" [totalCount]="totalCount()" (pageChange)="onPageChange($event)"></app-pager>
+  }
+</div>

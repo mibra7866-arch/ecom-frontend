@@ -1,0 +1,140 @@
+// Shared "single-form dialog" look — CSS-variable-driven so it adapts to whichever host's --ecom-*
+// tokens are in scope (light seller Profile page or dark admin Sellers module). Used by every modal
+// that's just a labeled-field form + Cancel/Save footer (BankDetailsModalComponent, SellerProfileModalComponent, ...)
+// instead of each one redefining the same rules under a different class prefix.
+@use 'breakpoints' as bp;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+}
+
+.bank-modal {
+  display: flex;
+  flex-direction: column;
+}
+
+.bank-modal__header {
+  padding: 24px 28px 4px;
+
+  @include bp.mobile {
+    padding: 18px 18px 4px;
+  }
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--ecom-text-muted);
+  }
+}
+
+.bank-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 28px 20px;
+
+  @include bp.mobile {
+    padding: 12px 18px 16px;
+  }
+}
+
+.bank-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ecom-text-muted);
+
+  input,
+  textarea {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--ecom-border);
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 400;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: var(--ecom-indigo);
+    }
+  }
+}
+
+.bank-modal__required {
+  font-weight: 400;
+  color: var(--ecom-text-muted);
+}
+
+.bank-modal__error {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--ecom-red);
+}
+
+.bank-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 28px 24px;
+  border-top: 1px solid var(--ecom-border);
+
+  @include bp.mobile {
+    padding: 12px 18px 18px;
+    flex-wrap: wrap;
+  }
+}
+
+.bank-modal__btn {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.86rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  @include bp.mobile {
+    height: 44px;
+    flex: 1 1 auto;
+  }
+}
+
+.bank-modal__btn--ghost {
+  background: none;
+  border: 1px solid var(--ecom-border);
+  color: var(--ecom-text-muted);
+
+  &:hover:not(:disabled) {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+.bank-modal__btn--solid {
+  background: var(--ecom-indigo);
+  color: #ffffff;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+}

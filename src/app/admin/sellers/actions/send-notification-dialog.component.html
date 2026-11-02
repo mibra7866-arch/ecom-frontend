@@ -1,0 +1,34 @@
+<div class="action-dialog">
+  <header class="action-dialog__header">
+    <h2>Send Notification</h2>
+    <p>Send an in-app notification to {{ data.sellerName }}.</p>
+  </header>
+
+  <div class="action-dialog__body">
+    @if (errorMessage()) {
+      <div class="error-banner">{{ errorMessage() }}</div>
+    }
+
+    <label class="action-dialog__field">
+      <span>Title</span>
+      <input type="text" [ngModel]="title()" (ngModelChange)="title.set($event)" placeholder="e.g. Reminder: complete your KYC" maxlength="120" />
+    </label>
+
+    <label class="action-dialog__field">
+      <span>Message</span>
+      <textarea rows="3" [ngModel]="body()" (ngModelChange)="body.set($event)" placeholder="Write the notification body…" maxlength="500"></textarea>
+    </label>
+
+    <label class="action-dialog__field">
+      <span>Link URL <span class="action-dialog__optional">(optional)</span></span>
+      <input type="text" [ngModel]="linkUrl()" (ngModelChange)="linkUrl.set($event)" placeholder="/seller/dashboard" />
+    </label>
+  </div>
+
+  <footer class="action-dialog__footer">
+    <button type="button" class="action-dialog__btn action-dialog__btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="action-dialog__btn action-dialog__btn--solid" [disabled]="!canSend()" (click)="send()">
+      {{ sending() ? 'Sending…' : 'Send' }}
+    </button>
+  </footer>
+</div>

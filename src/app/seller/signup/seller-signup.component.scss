@@ -1,0 +1,182 @@
+@use '../../shared/styles/breakpoints' as bp;
+
+.signup-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+
+  // Visual reorder only (not DOM order) so the wizard is what a mobile user sees first, instead of
+  // scrolling past the full marketing panel to reach the form. .signup-marketing's only focusable
+  // element is the trailing "Sign in" link, which tabbing to after the wizard's own controls is an
+  // acceptable tradeoff (same one already accepted on the seller-login screen).
+  @include bp.below-lg {
+    .signup-wizard {
+      order: -1;
+    }
+
+    .signup-marketing {
+      order: 2;
+    }
+  }
+
+  @include bp.tablet {
+    .signup-marketing,
+    .signup-wizard {
+      padding: 32px 24px;
+    }
+  }
+
+  @include bp.mobile {
+    .signup-marketing,
+    .signup-wizard {
+      padding: 24px 16px;
+    }
+  }
+}
+
+.signup-marketing {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.1), transparent 45%),
+    var(--ecom-surface);
+  color: var(--ecom-text);
+  padding: 56px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 32px;
+
+    mat-icon {
+      color: var(--ecom-indigo);
+    }
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    font-weight: 700;
+    margin: 0 0 12px;
+    max-width: 420px;
+  }
+
+  &__subtitle {
+    color: var(--ecom-text-muted);
+    max-width: 420px;
+    margin: 0 0 32px;
+  }
+
+  &__features {
+    list-style: none;
+    margin: 0 0 32px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    mat-icon {
+      color: var(--ecom-indigo);
+    }
+  }
+
+  &__footnote {
+    color: var(--ecom-text-muted);
+    font-size: 0.9rem;
+
+    a {
+      color: var(--ecom-indigo);
+      text-decoration: none;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.signup-wizard {
+  background: var(--ecom-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 56px 48px;
+}
+
+.stepper {
+  background: transparent;
+}
+
+.step-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.step-hint {
+  color: var(--ecom-text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 16px;
+}
+
+.kyc-upload-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  &__label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ecom-text);
+  }
+}
+
+.status-icon {
+  &--valid {
+    color: var(--ecom-green);
+  }
+
+  &--invalid {
+    color: var(--ecom-red);
+  }
+}
+
+.form-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--ecom-red);
+  font-size: 0.85rem;
+}

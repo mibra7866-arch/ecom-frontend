@@ -1,0 +1,77 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.seller-chat-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  // 100% of :host (which is 100% of .content, now that .content's own ancestor chain is height-bounded —
+  // see seller-sidebar.component.scss) instead of a hardcoded calc(100vh - Npx) that silently drifted out
+  // of sync with the real header/padding height and let the page scroll instead of just this panel.
+  height: 100%;
+  min-height: 0;
+}
+
+.seller-chat-page__header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.seller-chat-page__header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #14b8a6;
+  color: #ffffff;
+  flex: none;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.seller-chat-page__title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+@media (max-width: 480px) {
+  .seller-chat-page__title {
+    font-size: 1.25rem;
+  }
+
+  .seller-chat-page__header-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+
+    mat-icon {
+      font-size: 17px;
+      width: 17px;
+      height: 17px;
+    }
+  }
+}
+
+// The chat panel itself (ChatThreadComponent) is shared with the admin portal and keeps its own
+// neutral white card surface regardless of host theme — left as-is here so admin's chat view is
+// unaffected; the border still reads clearly as an elevated surface against the dark page.
+.seller-chat-page__panel {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--ecom-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}

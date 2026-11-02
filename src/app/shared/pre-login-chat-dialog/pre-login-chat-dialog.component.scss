@@ -1,0 +1,212 @@
+// Same light, self-contained surface as ChatThreadComponent — this dialog is only ever opened from
+// the (light) seller login page, but kept self-contained for the same reason that component is.
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 560px;
+  max-height: 80vh;
+  width: 380px;
+  max-width: 100%;
+  color-scheme: light;
+  color: #111827;
+  background: #ffffff;
+}
+
+.pre-login-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.pre-login-chat__header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.pre-login-chat__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #0f1f3d;
+
+  mat-icon {
+    color: #4f46e5;
+  }
+}
+
+.pre-login-chat__close {
+  border: none;
+  background: none;
+  cursor: pointer;
+  // #9ca3af read at ~2.5:1 against the white header — #57606e clears WCAG AA.
+  color: #57606e;
+  display: flex;
+
+  &:hover {
+    color: #4b5563;
+  }
+}
+
+.pre-login-chat__thread {
+  flex: 1;
+  min-height: 0;
+}
+
+.pre-login-chat__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 18px;
+  overflow-y: auto;
+}
+
+.pre-login-chat__text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #6b7280;
+}
+
+.pre-login-chat__error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #b91c1c;
+  font-size: 0.82rem;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex: none;
+  }
+}
+
+.pre-login-chat__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+
+  input {
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #111827;
+    font-weight: 400;
+
+    &:focus {
+      border-color: #0f1f3d;
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+}
+
+.pre-login-chat__start-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  margin-top: 4px;
+  border: none;
+  border-radius: 8px;
+  background: #0f1f3d;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: #16264a;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.pre-login-chat__spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  animation: pre-login-chat-spin 0.7s linear infinite;
+}
+
+@keyframes pre-login-chat-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pre-login-chat__notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 8px;
+  text-align: center;
+  color: #374151;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: #4f46e5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+}
+
+.pre-login-chat__notice-sub {
+  color: #6b7280 !important;
+  font-size: 0.8rem !important;
+
+  a {
+    color: #4f46e5;
+    font-weight: 600;
+  }
+}
+
+.pre-login-chat__link-btn {
+  margin-top: 4px;
+  border: none;
+  background: none;
+  color: #4f46e5;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

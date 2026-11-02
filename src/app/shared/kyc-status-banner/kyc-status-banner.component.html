@@ -1,0 +1,26 @@
+@if (!loading() && submission(); as s) {
+  @if (s.status === 'Rejected') {
+    <div class="kyc-banner kyc-banner--rejected">
+      <mat-icon class="kyc-banner__icon">gpp_bad</mat-icon>
+      <div class="kyc-banner__body">
+        <h3>KYC verification rejected</h3>
+        <p>Your KYC verification has been rejected. Please review the concerns and resubmit your documents.</p>
+        @if (s.rejectionReason) {
+          <p class="kyc-banner__reason"><strong>Reason:</strong> {{ s.rejectionReason }}</p>
+        }
+      </div>
+      <a class="kyc-banner__action" routerLink="/seller/home">
+        <mat-icon>upload_file</mat-icon>
+        Resubmit KYC
+      </a>
+    </div>
+  } @else if (s.status === 'AwaitingVerification') {
+    <div class="kyc-banner kyc-banner--pending">
+      <mat-icon class="kyc-banner__icon">hourglass_top</mat-icon>
+      <div class="kyc-banner__body">
+        <h3>Verification in progress</h3>
+        <p>Your KYC documents are under review. Products and Orders unlock once you're approved — everything else in your portal is available now.</p>
+      </div>
+    </div>
+  }
+}

@@ -1,0 +1,59 @@
+<div class="pre-login-chat">
+  <header class="pre-login-chat__header">
+    <div class="pre-login-chat__title">
+      <mat-icon>headset_mic</mat-icon>
+      <span>Chat with support</span>
+    </div>
+    <button type="button" class="pre-login-chat__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  @if (resolvedSellerId() && accessToken()) {
+    <div class="pre-login-chat__thread">
+      <app-chat-thread [sellerId]="resolvedSellerId()!" [accessTokenOverride]="accessToken()!" counterpartLabel="Support team"></app-chat-thread>
+    </div>
+  } @else {
+    <div class="pre-login-chat__body">
+      @if (notFoundMessage()) {
+        <div class="pre-login-chat__notice">
+          <mat-icon>mark_email_read</mat-icon>
+          <p>{{ notFoundMessage() }}</p>
+          <p class="pre-login-chat__notice-sub">You can also reach us directly at <a href="mailto:support&#64;ecom.example">support&#64;ecom.example</a>.</p>
+          <button type="button" class="pre-login-chat__link-btn" (click)="tryAnotherEmail()">Try another email</button>
+        </div>
+      } @else {
+        <p class="pre-login-chat__text">
+          Enter the email address on your seller account so we can pull up your conversation with support.
+        </p>
+
+        @if (errorMessage()) {
+          <div class="pre-login-chat__error">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <label class="pre-login-chat__field">
+          <span>Email address</span>
+          <input
+            type="email"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            (keydown.enter)="resolve()"
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+        </label>
+
+        <button type="button" class="pre-login-chat__start-btn" [disabled]="!isEmailValid() || resolving()" (click)="resolve()">
+          @if (resolving()) {
+            <span class="pre-login-chat__spinner"></span>
+          } @else {
+            Start chat
+          }
+        </button>
+      }
+    </div>
+  }
+</div>

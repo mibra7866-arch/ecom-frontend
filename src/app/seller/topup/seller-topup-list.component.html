@@ -1,0 +1,58 @@
+<div class="requests-page scroll-fixed">
+  <header class="requests-header">
+    <div class="requests-header__title-row">
+      <span class="requests-header__icon"><mat-icon>account_balance_wallet</mat-icon></span>
+      <div class="requests-header__text">
+        <h1 class="requests-header__title">Top Up</h1>
+        @if (!loading() && !errorMessage()) {
+          <p class="requests-header__subtext">{{ totalCount() }} request{{ totalCount() === 1 ? '' : 's' }}</p>
+        }
+      </div>
+    </div>
+    <button type="button" class="add-btn" (click)="openTopUpModal()">
+      <mat-icon>add</mat-icon>
+      Top Up
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="state">
+      <span class="spinner"></span>
+      <p>Loading requests…</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="state state--error">
+      <mat-icon>error</mat-icon>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" class="retry-btn" (click)="load()">Retry</button>
+    </div>
+  } @else if (requests().length === 0) {
+    <div class="state">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <p>No top-up requests yet — submit your first one</p>
+      <button type="button" class="add-btn" (click)="openTopUpModal()">
+        <mat-icon>add</mat-icon>
+        Top Up
+      </button>
+    </div>
+  } @else {
+    <div class="requests-list scroll-area">
+      @for (r of requests(); track r.id) {
+        <div class="request-row">
+          <div class="request-row__main">
+            <span class="request-row__amount">{{ r.amount | currency }}</span>
+            <span class="request-row__date">{{ r.requestedAtUtc | date: 'mediumDate' }}</span>
+          </div>
+          <div class="request-row__end">
+            @if (r.status === 'Rejected' && r.rejectionReason) {
+              <span class="request-row__reason">{{ r.rejectionReason }}</span>
+            }
+            <app-status-badge [status]="r.status"></app-status-badge>
+          </div>
+        </div>
+      }
+    </div>
+
+    <app-pager [page]="page()" [totalPages]="totalPages()" [totalCount]="totalCount()" (pageChange)="onPageChange($event)"></app-pager>
+  }
+</div>

@@ -1,0 +1,159 @@
+<div class="signup-shell">
+  <aside class="signup-marketing">
+    <div class="signup-marketing__brand">
+      <mat-icon>storefront</mat-icon>
+      <span>MyESellerStore</span>
+    </div>
+    <h1>Start selling in minutes</h1>
+    <p class="signup-marketing__subtitle">Join the MyESellerStore marketplace and let us handle fulfillment while you grow your brand.</p>
+    <ul class="signup-marketing__features">
+      @for (feature of features; track feature.text) {
+        <li>
+          <mat-icon>{{ feature.icon }}</mat-icon>
+          <span>{{ feature.text }}</span>
+        </li>
+      }
+    </ul>
+    <p class="signup-marketing__footnote">
+      Already have an account? <a routerLink="/seller/login">Sign in</a>
+    </p>
+  </aside>
+
+  <section class="signup-wizard">
+    @if (errorMessage()) {
+      <div class="form-banner">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <mat-stepper linear #stepper class="stepper" [orientation]="stepperOrientation()">
+      <mat-step [stepControl]="accountForm" label="Seller details">
+        <form [formGroup]="accountForm" class="step-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Full name</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input matInput formControlName="name" />
+            @if (accountForm.controls.name.invalid && accountForm.controls.name.touched) {
+              <mat-error>Name is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <mat-icon matPrefix>mail</mat-icon>
+            <input matInput type="email" formControlName="email" />
+            @if (accountForm.controls.email.invalid && accountForm.controls.email.touched) {
+              <mat-error>A valid email is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>LLC Code</mat-label>
+            <mat-icon matPrefix>vpn_key</mat-icon>
+            <input matInput formControlName="invitationCode" />
+            @if (inviteStatus() === 'checking') {
+              <mat-spinner matSuffix diameter="18"></mat-spinner>
+            } @else if (inviteStatus() === 'valid') {
+              <mat-icon matSuffix class="status-icon status-icon--valid">check_circle</mat-icon>
+            } @else if (inviteStatus() === 'invalid') {
+              <mat-icon matSuffix class="status-icon status-icon--invalid">cancel</mat-icon>
+            }
+            @if (inviteStatus() === 'invalid') {
+              <mat-error>{{ inviteMessage() || 'This LLC code is not valid.' }}</mat-error>
+            } @else if (accountForm.controls.invitationCode.hasError('required') && accountForm.controls.invitationCode.touched) {
+              <mat-error>An LLC code is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password</mat-label>
+            <mat-icon matPrefix>lock</mat-icon>
+            <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" />
+            <button mat-icon-button matSuffix type="button" (click)="hidePassword.set(!hidePassword())">
+              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (accountForm.controls.password.invalid && accountForm.controls.password.touched) {
+              <mat-error>Password must be at least 8 characters</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Confirm password</mat-label>
+            <mat-icon matPrefix>lock</mat-icon>
+            <input matInput [type]="hideConfirmPassword() ? 'password' : 'text'" formControlName="confirmPassword" />
+            <button mat-icon-button matSuffix type="button" (click)="hideConfirmPassword.set(!hideConfirmPassword())">
+              <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (accountForm.controls.confirmPassword.hasError('passwordMismatch') && accountForm.controls.confirmPassword.touched) {
+              <mat-error>Passwords do not match</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="step-actions">
+            <button mat-flat-button color="primary" type="button" matStepperNext [disabled]="accountForm.invalid || inviteStatus() === 'checking' || inviteStatus() === 'invalid'">
+              Continue
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step [stepControl]="storeForm" label="Store details">
+        <form [formGroup]="storeForm" class="step-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Store name</mat-label>
+            <mat-icon matPrefix>store</mat-icon>
+            <input matInput formControlName="storeName" />
+            @if (storeForm.controls.storeName.invalid && storeForm.controls.storeName.touched) {
+              <mat-error>Store name is required</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="step-actions">
+            <button mat-button type="button" matStepperPrevious>Back</button>
+            <button mat-flat-button color="primary" type="button" matStepperNext [disabled]="storeForm.invalid">
+              Continue
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step label="KYC upload">
+        <div class="step-form">
+          <p class="step-hint">Please upload the front and back side of your ID card.</p>
+
+          <div class="kyc-upload-slot">
+            <span class="kyc-upload-slot__label">Front side</span>
+            <app-file-upload
+              [multiple]="false"
+              [files]="idFrontFile() ? [idFrontFile()!] : []"
+              (filesSelected)="onFrontFileSelected($event)"
+              (fileRemoved)="onFrontFileRemoved()"
+            ></app-file-upload>
+          </div>
+
+          <div class="kyc-upload-slot">
+            <span class="kyc-upload-slot__label">Back side</span>
+            <app-file-upload
+              [multiple]="false"
+              [files]="idBackFile() ? [idBackFile()!] : []"
+              (filesSelected)="onBackFileSelected($event)"
+              (fileRemoved)="onBackFileRemoved()"
+            ></app-file-upload>
+          </div>
+
+          <div class="step-actions">
+            <button mat-button type="button" matStepperPrevious [disabled]="submitting()">Back</button>
+            <button mat-flat-button color="primary" type="button" (click)="finish()" [disabled]="submitting() || !kycFilesValid()">
+              @if (submitting()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                Finish
+              }
+            </button>
+          </div>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  </section>
+</div>

@@ -1,0 +1,73 @@
+// Canonical product/order image-thumbnail sizing, shared by every spot across Admin and Seller where a
+// product or order photo appears — list rows, detail headers, and browsing-grid cards. Two shapes:
+//   - thumb-row: a fixed 64x64 box for list rows / detail headers (product rows, order cards, order
+//     detail, bulk-create rows, the product form's "current image" preview).
+//   - thumb-grid: a fixed 200x200 box for browsing-grid cards (product-card, catalog-modal,
+//     order-picker). This used to be a *fluid* square (100% of the grid column), which looked
+//     consistent card-to-card on any one screen but rendered at a different actual pixel size on every
+//     page depending on that page's own column width (111px in one dialog, 225px in the products grid,
+//     etc). The grid containers themselves now use a fixed (not stretching) column track — see each
+//     `*__grid` rule — so this box is always exactly the same size everywhere.
+// Either way, one fixed box + object-fit: cover means the box never depends on the image's own aspect
+// ratio, so nothing crops awkwardly and nothing shifts as images load in.
+$thumb-row-size: 64px;
+$thumb-row-radius: 12px;
+$thumb-grid-size: 200px;
+
+@mixin thumb-row($size: $thumb-row-size, $radius: $thumb-row-radius) {
+  // display: block (not the <img> default of inline) so width/height keep applying even when the
+  // image fails to load — a broken inline-rendered <img> sizes itself off its alt text instead of its
+  // box, which is what let a missing product photo collapse the thumbnail down to a sliver.
+  display: block;
+  flex: none;
+  width: $size;
+  height: $size;
+  border-radius: $radius;
+  object-fit: cover;
+  background: var(--ecom-surface-alt);
+
+  &--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ecom-text-muted);
+  }
+}
+
+// Browsing-grid card thumbnail: a fixed square (see $thumb-grid-size above) so it's the same size on
+// every page regardless of that page's own grid width, object-fit: cover so it never distorts. Pair
+// with a `*__grid { grid-template-columns: repeat(auto-fill, $thumb-grid-size + card padding); }` —
+// a *fixed*, non-stretching track — otherwise the grid would just stretch this back out again.
+@mixin thumb-grid($size: $thumb-grid-size, $radius: 9px) {
+  display: block;
+  width: $size;
+  height: $size;
+  border-radius: $radius;
+  object-fit: cover;
+  background: var(--ecom-surface);
+
+  &--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ecom-text-muted);
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+// Applied only to the loaded <img> (never the placeholder <div>) via a tag-qualified selector, e.g.
+// `img.product-card__image { @include thumb.thumb-clickable; }` — since only an <img> can match that
+// selector, the placeholder never picks up a pointer cursor for a click that has nothing to open.
+@mixin thumb-clickable {
+  cursor: zoom-in;
+  transition: filter 0.15s ease;
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+}

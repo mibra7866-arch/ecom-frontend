@@ -1,0 +1,117 @@
+// Layout styles for this screen live in the global .list-page utility classes (src/styles.scss).
+@use '../../shared/styles/breakpoints' as bp;
+@use '../../shared/styles/status-tabs' as status-tabs;
+
+// Title (.list-page__header, global) / filters row (toggles + results pill + search, all sharing one
+// line, search pushed to the row's end via margin-left: auto) stack as two rows — the title always
+// reads as its own line and the filter row has the full page width to itself.
+.kyc-review__filters-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+  min-width: 0;
+
+  mat-button-toggle-group {
+    @include status-tabs.dark-blue-toggle-group;
+  }
+}
+
+// No existing search-input precedent in the admin (dark) area to copy pixel-for-pixel — matches the
+// input tokens already established this session for admin dialogs (border/surface-alt/indigo focus).
+.kyc-review__search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  margin-left: auto;
+  border-radius: 8px;
+  border: 1px solid var(--ecom-border);
+  background: var(--ecom-surface-alt);
+  max-width: 280px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--ecom-text-muted);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--ecom-text);
+    font-family: inherit;
+    font-size: 0.85rem;
+
+    &::placeholder {
+      color: var(--ecom-text-muted);
+    }
+  }
+
+  &:focus-within {
+    border-color: var(--ecom-indigo);
+  }
+}
+
+@include bp.mobile {
+  .kyc-review__search {
+    // On mobile the toggles + results pill already fill the row, so the search box wraps onto its
+    // own line — flex-basis 100% makes it a full-width bar there instead of shrinking to content size.
+    max-width: none;
+    flex: 1 1 100%;
+  }
+}
+
+// The shared .list-table/.list-page__table-wrap styles (src/styles.scss) use a very faint border and
+// a muted-gray header color app-wide. Per request, this page's table border and column header row are
+// filled with the dark tone from the admin dashboard's first widget instead (app-stat-card--featured's
+// border/background, see admin-dashboard.component.html's "Sellers' Total Balance" card) — scoped to
+// this page only, not a global change to every other list-table screen.
+.list-page__table-wrap {
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.list-table th.mat-mdc-header-cell {
+  background: #0c1e3f;
+  color: #ffffff;
+  border-bottom-color: rgba(59, 130, 246, 0.35);
+}
+
+.kyc-documents {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kyc-documents__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  // Reset browser default <button> chrome — this class now also renders as a <button> for image
+  // documents (opens the lightbox) alongside the plain <a> it already used for non-image ones; these
+  // resets are no-ops for the <a> case.
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--ecom-indigo);
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  mat-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+  }
+}

@@ -1,0 +1,129 @@
+<div class="list-page scroll-fixed">
+  <div class="orders-header">
+    <span class="orders-header__icon"><mat-icon>shopping_bag</mat-icon></span>
+    <div>
+      <h1>Orders</h1>
+      <p class="orders-header__subtext">Fulfillment &amp; status</p>
+    </div>
+  </div>
+
+  <div class="orders-tabs">
+    @for (tab of tabs; track tab.key) {
+      <button
+        type="button"
+        class="orders-tabs__pill"
+        [class.orders-tabs__pill--active]="activeTab() === tab.key"
+        (click)="setFilter(tab)"
+      >
+        <span class="orders-tabs__dot" [class]="tab.dotClass"></span>
+        {{ tab.label }}
+        @if (tabCount(tab) > 0) {
+          <span class="orders-tabs__count">{{ tabCount(tab) }}</span>
+        }
+      </button>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="list-page__loading">
+      <mat-spinner diameter="28"></mat-spinner>
+    </div>
+  } @else if (orders().length === 0) {
+    <div class="list-page__table-wrap">
+      <div class="orders-empty">
+        <span class="orders-empty__icon"><mat-icon>assignment</mat-icon></span>
+        <h2 class="orders-empty__title">No orders here yet</h2>
+        <p class="orders-empty__subtext">When our Support team assigns an order to your shop it will appear in this list.</p>
+      </div>
+    </div>
+  } @else {
+    <div class="list-page__table-wrap">
+      <div class="scroll-area">
+        <table mat-table [dataSource]="orders()" class="list-table">
+          <ng-container matColumnDef="image">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let o">
+              @if (o.productImageUrl) {
+                <img class="seller-orders-thumb" [src]="fileUrl(o.productImageUrl)" [alt]="o.productName" (click)="openImage($event, o)" />
+              } @else {
+                <div class="seller-orders-thumb seller-orders-thumb--placeholder">
+                  <mat-icon>image</mat-icon>
+                </div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="product">
+            <th mat-header-cell *matHeaderCellDef>Product</th>
+            <td mat-cell *matCellDef="let o" class="seller-orders-product-cell">{{ o.productName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="customer">
+            <th mat-header-cell *matHeaderCellDef>Customer</th>
+            <td mat-cell *matCellDef="let o">{{ o.maskedCustomerName ?? '—' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef>Qty</th>
+            <td mat-cell *matCellDef="let o">&times;{{ o.quantity }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef>Price</th>
+            <td mat-cell *matCellDef="let o">
+              <div class="seller-orders-price-cell">
+                <span class="seller-orders-price-cell__amount">{{ o.amount | currency }}</span>
+                <span class="seller-orders-price-cell__profit">
+                  <mat-icon>arrow_upward</mat-icon>
+                  {{ o.profit | currency }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let o">
+              <span class="order-status-pill" [class]="statusClass(o)">
+                <span class="order-status-pill__dot"></span>
+                {{ statusLabel(o) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let o">{{ o.createdAt | date: 'mediumDate' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef title="Actions">Actions</th>
+            <td mat-cell *matCellDef="let o">
+              <button type="button" mat-icon-button aria-label="View order" title="View order" (click)="open(o)">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns" class="seller-orders-row" (click)="open(row)"></tr>
+        </table>
+      </div>
+
+      <div class="list-cards">
+        @for (order of orders(); track order.id) {
+          <app-seller-order-card [order]="order" (open)="open($event)"></app-seller-order-card>
+        }
+      </div>
+    </div>
+
+    <app-pager [page]="page()" [totalPages]="totalPages()" [totalCount]="totalCount()" (pageChange)="onPageChange($event)"></app-pager>
+  }
+</div>

@@ -1,0 +1,154 @@
+// Layout styles for this screen live in the global .list-page/.list-table/.list-cards utility classes
+// (src/styles.scss) — desktop renders the .list-table below, mobile renders the existing
+// <app-seller-order-card> row-card list (wrapped in .list-cards so only one shows at a time).
+@use '../../shared/styles/thumbnails' as thumb;
+@use '../../shared/styles/status-tabs' as tabs;
+
+@include tabs.status-tabs-pills;
+
+.orders-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.orders-header__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f97316;
+  color: #ffffff;
+  flex: none;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.orders-header__subtext {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--ecom-text-muted);
+}
+
+// Desktop table cells — the row itself is the click target (same "whole row opens the order" idea
+// the row-card already used), so it gets a pointer cursor on top of .list-table's own hover tint.
+.seller-orders-row {
+  cursor: pointer;
+}
+
+.seller-orders-thumb {
+  @include thumb.thumb-row;
+  width: 44px;
+  height: 44px;
+}
+
+img.seller-orders-thumb {
+  @include thumb.thumb-clickable;
+}
+
+.seller-orders-product-cell {
+  font-weight: 600;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-orders-price-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.seller-orders-price-cell__amount {
+  font-weight: 700;
+}
+
+.seller-orders-price-cell__profit {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ecom-green);
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+  }
+}
+
+// Matches the reference design's empty state: a muted icon tile, a bold heading, and a short
+// explanatory line — inside the same .list-page__table-wrap card panel the loaded list uses, so the
+// empty and populated states occupy the same visual footprint on the page.
+.orders-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.orders-empty__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--ecom-surface-alt);
+  color: var(--ecom-text-muted);
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.orders-empty__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.orders-empty__subtext {
+  margin: 0;
+  max-width: 320px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ecom-text-muted);
+}
+
+@media (max-width: 480px) {
+  .list-page h1 {
+    font-size: 1.25rem;
+  }
+
+  .orders-header__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+
+    mat-icon {
+      font-size: 17px;
+      width: 17px;
+      height: 17px;
+    }
+  }
+}

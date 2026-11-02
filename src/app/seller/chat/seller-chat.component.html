@@ -1,0 +1,11 @@
+<div class="seller-chat-page">
+  <div class="seller-chat-page__header">
+    <span class="seller-chat-page__header-icon"><mat-icon>chat</mat-icon></span>
+    <div>
+      <h1 class="seller-chat-page__title">Support</h1>
+    </div>
+  </div>
+  <div class="seller-chat-page__panel">
+    <app-chat-thread [sellerId]="tokenService.claims().userId ?? 0" counterpartLabel="Support team"></app-chat-thread>
+  </div>
+</div>

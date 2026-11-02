@@ -1,0 +1,144 @@
+@use '../../shared/styles/breakpoints' as bp;
+
+.shell {
+  height: 100dvh;
+  background: var(--ecom-bg);
+}
+
+.shell__sidenav {
+  width: 240px;
+  background: var(--ecom-surface);
+  border-right: 1px solid var(--ecom-border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 12px;
+
+  @include bp.below-xl {
+    // In mode="over" the drawer sits above everything else at the screen's left edge, so it's the
+    // one place in the admin shell that genuinely needs the safe-area inset.
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-left: max(12px, env(safe-area-inset-left));
+  }
+}
+
+// Only rendered when isMobile() — the sidenav becomes mode="over" (hidden by default) below 1024px,
+// so this bar is what carries navigation access instead.
+.shell__mobile-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 56px;
+  padding: 0 12px;
+  padding-top: env(safe-area-inset-top, 0);
+  background: var(--ecom-surface);
+  border-bottom: 1px solid var(--ecom-border);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
+  &-title {
+    font-weight: 600;
+    color: var(--ecom-text);
+  }
+}
+
+.shell__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--ecom-text);
+  // padding-top reuses the same 12px unit .shell__group uses between MANAGE/COMMUNICATION/FINANCE/
+  // ACTIVITY, added on top of .shell__sidenav's own 20px padding so the logo is no longer flush
+  // against the sidebar's top edge.
+  padding: 12px 12px 20px;
+
+  mat-icon {
+    color: var(--ecom-indigo);
+  }
+
+  app-notification-bell {
+    margin-left: auto;
+  }
+}
+
+.shell__dashboard-link,
+.shell__link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  // mat-button (unthemed) defaults its own label to the theme's primary color, which was silently
+  // beating this rule — every inactive link rendered in the same indigo as the active one, so the
+  // background pill was the ONLY thing distinguishing active from inactive. !important forces the
+  // intended muted/indigo split (matches the seller sidebar's already-correct inactive contrast).
+  color: var(--ecom-text-muted) !important;
+  // Explicit weight (was relying on mat-button's own default) so inactive items read clearly
+  // against the dark sidebar instead of looking washed out — matches the seller sidebar's own
+  // inactive/active weight split for a consistent nav standard across both portals.
+  font-weight: 500;
+  border-radius: 10px;
+  margin-bottom: 2px;
+
+  mat-icon {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+
+  &.active {
+    background: rgba(99, 102, 241, 0.14);
+    color: var(--ecom-indigo) !important;
+    font-weight: 700;
+  }
+}
+
+.shell__badge {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shell__dashboard-link {
+  margin-bottom: 12px;
+}
+
+.shell__group {
+  margin-top: 8px;
+}
+
+.shell__group-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ecom-text-muted);
+  padding: 0 12px;
+  margin: 0 0 6px;
+}
+
+.shell__footer {
+  margin-top: auto;
+  // Back to 16px (was briefly 28px) — the nav content (dashboard link + 4 groups' worth of links)
+  // doesn't leave room for that extra 12px without the sidebar needing to scroll, and a scrollbar
+  // here is worse than a slightly smaller gap above Sign out.
+  padding-top: 16px;
+}
+
+.shell__logout {
+  width: 100%;
+}
+
+.shell__content {
+  background: var(--ecom-bg);
+  overflow-y: auto;
+}

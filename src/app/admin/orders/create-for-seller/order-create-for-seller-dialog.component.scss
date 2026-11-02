@@ -1,0 +1,517 @@
+// Base .order-picker__* shell/search/state/grid/card styling is deliberately identical to
+// order-create-dialog.component.scss (the old whole-catalog picker this replaced as the "Create
+// Order" button's target) — same visual language, just extended with a heading/back-button row and
+// two new pieces (the seller list, the address form) for this dialog's extra steps.
+@use '../../../shared/styles/thumbnails' as thumb;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+}
+
+.order-picker {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 90vh;
+}
+
+.order-picker__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 16px;
+  flex: none;
+}
+
+.order-picker__heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--ecom-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.order-picker__back {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-top: 2px;
+  border: none;
+  border-radius: 8px;
+  background: var(--ecom-surface-alt);
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--ecom-text);
+  }
+}
+
+.order-picker__close {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+  }
+}
+
+.order-picker__search {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 28px 14px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 10px;
+  background: var(--ecom-surface-alt);
+
+  mat-icon {
+    color: var(--ecom-text-muted);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.9rem;
+    color: var(--ecom-text);
+    font-family: inherit;
+
+    &::placeholder {
+      color: var(--ecom-text-muted);
+    }
+  }
+}
+
+.order-picker__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 28px 24px;
+}
+
+.order-picker__error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--ecom-red);
+  font-size: 0.85rem;
+}
+
+.order-picker__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 30vh;
+  color: var(--ecom-text-muted);
+  text-align: center;
+
+  mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+  }
+}
+
+// Step 1 — sellers, a plain clickable row list rather than a card grid (there's no product image to
+// make a grid worthwhile here, and a list scans faster once there are more than a handful of sellers).
+.seller-picker__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.seller-picker__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 10px;
+  background: var(--ecom-surface-alt);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--ecom-indigo);
+  }
+}
+
+.seller-picker__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.seller-picker__name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.seller-picker__meta {
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-picker__chevron {
+  flex: none;
+  color: var(--ecom-text-muted);
+}
+
+// Select All sits between the search bar and the scrollable body — same horizontal inset as the search
+// bar (28px), not inside .order-picker__body, so it stays visible while the card grid scrolls.
+.order-picker__select-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 28px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+  width: fit-content;
+
+  input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--ecom-indigo);
+    cursor: pointer;
+  }
+}
+
+// Step 2 — that seller's own products.
+.order-picker__grid {
+  display: grid;
+  // 224px = thumb.$thumb-grid-size (200px, the fixed photo size) + this card's own 12px+12px padding —
+  // a FIXED (non-stretching) track so every photo renders at the same pixel size as every other
+  // browsing-grid card in the app, regardless of how many columns fit in this dialog.
+  grid-template-columns: repeat(auto-fill, 224px);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+// A <label> now (not a <div>) so the whole card toggles its checkbox — clicking the thumb still opens
+// the zoom preview instead, since that click stops propagation before it reaches this element.
+.order-picker__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--ecom-surface-alt);
+  border: 1.5px solid var(--ecom-border);
+  border-radius: 12px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--ecom-indigo);
+  }
+
+  &--selected {
+    border-color: var(--ecom-indigo);
+    background: color-mix(in srgb, var(--ecom-indigo) 8%, var(--ecom-surface-alt));
+  }
+}
+
+.order-picker__checkbox {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--ecom-indigo);
+  cursor: pointer;
+}
+
+.order-picker__thumb {
+  @include thumb.thumb-grid;
+}
+
+img.order-picker__thumb {
+  @include thumb.thumb-clickable;
+}
+
+.order-picker__title {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.3em;
+}
+
+.order-picker__prices {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.order-picker__price {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.order-picker__commission {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ecom-green);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.order-picker__action {
+  height: 36px;
+  border-radius: 9px;
+  border: none;
+  background: var(--ecom-indigo);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Sticky footer bar under the scrollable product grid — mirrors the seller-orders-dialog's own
+// header-stats typography scale for the live count/totals, paired with the same .order-picker__action
+// primary-button styling used everywhere else in this dialog.
+.order-picker__summary-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 28px;
+  border-top: 1px solid var(--ecom-border);
+}
+
+.order-picker__summary-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.order-picker__summary-count {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.order-picker__summary-detail {
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+}
+
+.order-picker__summary-bar .order-picker__action {
+  flex: none;
+  padding: 0 24px;
+}
+
+// Step 4 — result.
+.order-picker__result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 0 24px;
+  text-align: center;
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.86rem;
+    color: var(--ecom-text-muted);
+  }
+}
+
+.order-picker__result-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: var(--ecom-green);
+
+  &--partial {
+    color: var(--ecom-amber);
+  }
+}
+
+.order-picker__result-failures {
+  margin: 4px 0 0;
+  padding: 0 0 0 18px;
+  text-align: left;
+  font-size: 0.82rem;
+  color: var(--ecom-text-muted);
+
+  li {
+    margin-bottom: 4px;
+  }
+}
+
+// Step 3 — customer address form.
+.order-address-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.order-address-form__row {
+  display: flex;
+  gap: 14px;
+
+  .order-address-form__field {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.order-address-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.84rem;
+  color: var(--ecom-text-muted);
+
+  input {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--ecom-border);
+    border-radius: 9px;
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+    font-size: 0.9rem;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: var(--ecom-indigo);
+    }
+  }
+}
+
+.order-address-form__optional {
+  font-weight: 400;
+  color: var(--ecom-text-muted);
+}
+
+.order-address-form__error {
+  font-size: 0.76rem;
+  color: var(--ecom-red);
+}
+
+.order-address-form__submit {
+  align-self: flex-end;
+  min-width: 140px;
+  margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+  .order-picker__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  // Below this width the grid column itself is no longer the fixed thumb.$thumb-grid-size track — it's
+  // fluid (1fr) so two cards can actually fit side by side — so the photo has to go back to fluid too,
+  // or it would overflow its own (now narrower) card. Desktop keeps the fixed 200px size untouched.
+  .order-picker__thumb {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .order-picker__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .order-address-form__row {
+    flex-direction: column;
+  }
+}

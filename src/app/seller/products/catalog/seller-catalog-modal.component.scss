@@ -1,0 +1,362 @@
+// Same shell/header/search/state/grid-card shape as OrderCreateDialogComponent's .order-picker
+// (admin/orders/create/) — this is that same "browse a product catalog in a dialog" pattern, extended
+// with a category filter and a remaining-slots/quick-add row. Only Quick Add Random is wired up (no
+// per-item or select-and-add-many actions) — see the component's doc comment.
+@use '../../../shared/styles/breakpoints' as bp;
+@use '../../../shared/styles/thumbnails' as thumb;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+}
+
+.catalog-modal {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 90vh;
+}
+
+.catalog-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 16px;
+  flex: none;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--ecom-text-muted);
+  }
+}
+
+.catalog-modal__close {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+  }
+}
+
+.catalog-modal__filters {
+  flex: none;
+  display: flex;
+  gap: 10px;
+  margin: 0 28px 14px;
+}
+
+.catalog-modal__search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 14px;
+  background: var(--ecom-surface-alt);
+
+  mat-icon {
+    color: var(--ecom-text-muted);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.9rem;
+    color: var(--ecom-text);
+    font-family: inherit;
+
+    &::placeholder {
+      color: var(--ecom-text-muted);
+    }
+  }
+}
+
+.catalog-modal__category {
+  flex: none;
+  width: 180px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 14px;
+  background: var(--ecom-surface-alt);
+  display: flex;
+  align-items: center;
+
+  ::ng-deep .mat-mdc-select-value,
+  ::ng-deep .mat-mdc-select-arrow {
+    color: var(--ecom-text);
+  }
+}
+
+.catalog-modal__slots-row {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 28px 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--ecom-surface-alt);
+}
+
+.catalog-modal__slots {
+  font-size: 0.85rem;
+  color: var(--ecom-text-muted);
+
+  strong {
+    color: var(--ecom-text);
+  }
+}
+
+.catalog-modal__quick-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--ecom-indigo);
+  border-radius: 999px;
+  background: none;
+  color: var(--ecom-indigo);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba(99, 102, 241, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.catalog-modal__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 28px 24px;
+}
+
+.catalog-modal__error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--ecom-red);
+  font-size: 0.85rem;
+}
+
+.catalog-modal__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 30vh;
+  color: var(--ecom-text-muted);
+  text-align: center;
+
+  mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.catalog-modal__grid {
+  display: grid;
+  // 224px = thumb.$thumb-grid-size (200px, the fixed photo size) + this card's own 12px+12px padding —
+  // a FIXED (non-stretching) track so every photo renders at the same pixel size as every other
+  // browsing-grid card in the app, regardless of how many columns fit in this dialog.
+  grid-template-columns: repeat(auto-fill, 224px);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.catalog-modal__card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--ecom-surface-alt);
+  border: 1px solid var(--ecom-border);
+  border-radius: 12px;
+}
+
+.catalog-modal__thumb-wrap {
+  position: relative;
+}
+
+.catalog-modal__thumb {
+  @include thumb.thumb-grid;
+}
+
+img.catalog-modal__thumb {
+  @include thumb.thumb-clickable;
+}
+
+.catalog-modal__title {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.3em;
+}
+
+.catalog-modal__prices {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.catalog-modal__chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 6px;
+  border-radius: 10px;
+  background: var(--ecom-surface);
+}
+
+.catalog-modal__chip-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ecom-text-muted);
+}
+
+.catalog-modal__chip-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.catalog-modal__chip--sell {
+  background: rgba(34, 197, 94, 0.12);
+
+  .catalog-modal__chip-label,
+  .catalog-modal__chip-value {
+    color: var(--ecom-green);
+  }
+}
+
+.catalog-modal__profit {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ecom-green);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .catalog-modal__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  // Below this width the grid column itself is no longer the fixed thumb.$thumb-grid-size track — it's
+  // fluid (1fr) so two cards can actually fit side by side — so the photo has to go back to fluid too,
+  // or it would overflow its own (now narrower) card. Desktop keeps the fixed 200px size untouched.
+  .catalog-modal__thumb {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .catalog-modal__filters {
+    flex-direction: column;
+  }
+
+  .catalog-modal__category {
+    width: 100%;
+  }
+}
+
+@media (max-width: 340px) {
+  .catalog-modal__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include bp.mobile {
+  .catalog-modal__header {
+    padding: 18px 16px 12px;
+  }
+
+  .catalog-modal__filters,
+  .catalog-modal__slots-row {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .catalog-modal__body {
+    padding: 4px 16px 18px;
+  }
+
+  .catalog-modal__grid {
+    gap: 10px;
+  }
+
+  .catalog-modal__card {
+    padding: 8px;
+  }
+}

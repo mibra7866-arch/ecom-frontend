@@ -1,0 +1,12 @@
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-badge">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <h1 class="auth-title">{{ title }}</h1>
+    @if (subtitle) {
+      <p class="auth-subtitle">{{ subtitle }}</p>
+    }
+    <ng-content></ng-content>
+  </div>
+</div>

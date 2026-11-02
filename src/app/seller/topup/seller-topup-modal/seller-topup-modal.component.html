@@ -1,0 +1,162 @@
+<div class="topup-modal">
+  <header class="topup-modal__header">
+    <div>
+      <h2>Top Up Shop Balance</h2>
+      <p>Enter the amount you've paid and attach your payment receipt for review.</p>
+    </div>
+    <button type="button" class="topup-modal__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  @if (submitted()) {
+    <div class="topup-modal__confirmation">
+      <mat-icon>check_circle</mat-icon>
+      <p>Your top-up request has been submitted and is pending Support team review.</p>
+      <button type="button" class="topup-modal__submit" (click)="close()">Done</button>
+    </div>
+  } @else {
+    <div class="topup-modal__body">
+      @if (errorMessage()) {
+        <div class="error-banner">
+          <mat-icon>error</mat-icon>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <!-- Bank / E Vault selector -->
+      <div class="topup-modal__field">
+        <span class="topup-modal__label">Payment Method</span>
+        <mat-button-toggle-group class="topup-modal__method-toggle" [value]="paymentMethod()" (change)="setPaymentMethod($event.value)">
+          <mat-button-toggle value="Bank">Bank</mat-button-toggle>
+          <mat-button-toggle value="EVault">E Vault</mat-button-toggle>
+        </mat-button-toggle-group>
+
+        @if (accountsLoading()) {
+          <div class="bank-selector__loading">
+            <span class="bank-selector__spinner"></span>
+          </div>
+        } @else if (accountsError()) {
+          <div class="error-banner">
+            <mat-icon>error</mat-icon>
+            <span>{{ accountsError() }}</span>
+          </div>
+        } @else if (accounts().length === 0) {
+          <div class="bank-selector__empty">
+            <mat-icon>{{ paymentMethodConfig().icon }}</mat-icon>
+            <p>{{ paymentMethodConfig().emptyTitle }}</p>
+            <span>{{ paymentMethodConfig().emptyMessage }}</span>
+          </div>
+        } @else {
+          <div class="bank-selector">
+            @for (account of accounts(); track account.id) {
+              <button
+                type="button"
+                class="bank-selector__tab"
+                [class.bank-selector__tab--active]="account.id === selectedAccountId()"
+                (click)="selectAccount(account)"
+              >
+                <span class="bank-selector__icon"><mat-icon>{{ paymentMethodConfig().icon }}</mat-icon></span>
+                <span class="bank-selector__tab-text">
+                  <span class="bank-selector__bank-name">{{ account.bankName }}</span>
+                  <span class="bank-selector__account-number">{{ maskAccountNumber(account.accountNumber) }}</span>
+                </span>
+                @if (account.isDefault) {
+                  <span class="bank-selector__badge">Primary</span>
+                }
+              </button>
+            }
+          </div>
+
+          @if (selectedAccount(); as selected) {
+            <div class="bank-detail">
+              <div class="bank-detail__header">
+                <span class="bank-detail__bank-name"><mat-icon>{{ paymentMethodConfig().icon }}</mat-icon>{{ selected.bankName }}</span>
+                @if (selected.isDefault) {
+                  <span class="bank-selector__badge bank-selector__badge--outline">★ Primary</span>
+                }
+              </div>
+
+              <div class="bank-detail__grid">
+                <div class="bank-detail__cell">
+                  <span class="bank-detail__label">Account Holder</span>
+                  <span class="bank-detail__value">{{ selected.accountHolderName }}</span>
+                </div>
+
+                <div class="bank-detail__cell">
+                  <span class="bank-detail__label">{{ paymentMethodConfig().accountNumberLabel }}</span>
+                  <div class="bank-detail__value-row">
+                    <span class="bank-detail__value">{{ selected.accountNumber }}</span>
+                    <button type="button" class="bank-detail__copy-btn" (click)="copy(selected.accountNumber, 'accountNumber')" aria-label="Copy account number">
+                      <mat-icon>{{ copiedField() === 'accountNumber' ? 'check' : 'content_copy' }}</mat-icon>
+                    </button>
+                  </div>
+                </div>
+
+                @if (selected.iban) {
+                  <div class="bank-detail__cell bank-detail__cell--full">
+                    <span class="bank-detail__label">IBAN</span>
+                    <div class="bank-detail__value-row">
+                      <span class="bank-detail__value">{{ selected.iban }}</span>
+                      <button type="button" class="bank-detail__copy-btn" (click)="copy(selected.iban, 'iban')" aria-label="Copy IBAN">
+                        <mat-icon>{{ copiedField() === 'iban' ? 'check' : 'content_copy' }}</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="topup-modal__row">
+        <label class="topup-modal__field">
+          <span class="topup-modal__label">Amount</span>
+          <div class="topup-modal__amount">
+            <span class="topup-modal__currency">$</span>
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              placeholder="0.00"
+              [value]="amount() ?? ''"
+              (input)="onAmountInput($any($event.target).value)"
+            />
+          </div>
+        </label>
+
+        <label class="topup-modal__field">
+          <span class="topup-modal__label">Note <span class="topup-modal__optional">(optional)</span></span>
+          <input type="text" placeholder="Transaction ID or other reference" [value]="note()" (input)="note.set($any($event.target).value)" />
+        </label>
+      </div>
+
+      <div class="topup-modal__field">
+        <span class="topup-modal__label">Payment receipt</span>
+        <app-file-upload
+          theme="light"
+          [dense]="true"
+          [multiple]="false"
+          accept="image/*,.pdf"
+          hint="Any image or PDF, up to 10 MB"
+          [files]="receipt() ? [receipt()!] : []"
+          (filesSelected)="onReceiptSelected($event)"
+          (fileRemoved)="onReceiptRemoved()"
+        ></app-file-upload>
+      </div>
+    </div>
+
+    <footer class="topup-modal__footer">
+      <button type="button" class="topup-modal__cancel" (click)="close()">Cancel</button>
+      <button type="button" class="topup-modal__submit" [disabled]="!isValid() || submitting()" (click)="submit()">
+        @if (submitting()) {
+          <span class="topup-modal__spinner"></span>
+          Submitting…
+        } @else {
+          Submit Top-Up Request
+        }
+      </button>
+    </footer>
+  }
+</div>

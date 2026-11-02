@@ -1,0 +1,84 @@
+<div class="action-dialog">
+  <header class="action-dialog__header">
+    <h2>All Notifications</h2>
+    <p>{{ data.sellerName }}'s notifications ({{ totalCount() }}).</p>
+  </header>
+
+  <div class="action-dialog__body">
+    @if (errorMessage()) {
+      <div class="error-banner">{{ errorMessage() }}</div>
+    }
+
+    @if (loading()) {
+      <div class="action-dialog__empty">
+        <mat-spinner diameter="24"></mat-spinner>
+      </div>
+    } @else if (items().length === 0) {
+      <p class="action-dialog__empty">No notifications for this seller yet.</p>
+    } @else {
+      <div class="action-dialog__bulk-bar">
+        <label class="action-dialog__checkbox-label">
+          <input type="checkbox" [checked]="allSelected()" (change)="toggleSelectAll()" [disabled]="submitting()" />
+          Select all
+        </label>
+
+        @if (selectedCount() > 0) {
+          <span class="action-dialog__bulk-count">{{ selectedCount() }} selected</span>
+        }
+
+        <button
+          type="button"
+          class="action-dialog__btn action-dialog__btn--solid action-dialog__btn--danger"
+          [disabled]="selectedCount() === 0 || submitting()"
+          (click)="deleteSelected()"
+        >
+          Delete Selected
+        </button>
+      </div>
+
+      <div class="action-dialog__list">
+        @for (item of items(); track item.id) {
+          <div class="action-dialog__list-row action-dialog__list-row--notification" [class.action-dialog__list-row--unread]="!item.isRead">
+            <input
+              type="checkbox"
+              class="action-dialog__row-checkbox"
+              [checked]="isSelected(item.id)"
+              (change)="toggleSelected(item.id)"
+              [disabled]="submitting()"
+              [attr.aria-label]="'Select notification ' + item.title"
+            />
+
+            <mat-icon class="action-dialog__row-icon">{{ iconFor(item.type) }}</mat-icon>
+
+            <div class="action-dialog__list-meta">
+              <span class="action-dialog__notification-title">
+                {{ item.title }}
+                @if (!item.isRead) {
+                  <span class="action-dialog__unread-dot" aria-label="Unread"></span>
+                }
+              </span>
+              <span class="action-dialog__notification-body">{{ item.body }}</span>
+              <span>{{ item.createdAtUtc | date: 'medium' }}</span>
+            </div>
+
+            <button
+              type="button"
+              class="action-dialog__row-delete"
+              [disabled]="submitting()"
+              (click)="deleteOne(item)"
+              aria-label="Delete notification"
+            >
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+
+      <app-pager [page]="page()" [totalPages]="totalPages()" [totalCount]="totalCount()" (pageChange)="onPageChange($event)"></app-pager>
+    }
+  </div>
+
+  <footer class="action-dialog__footer">
+    <button type="button" class="action-dialog__btn action-dialog__btn--ghost" (click)="close()">Close</button>
+  </footer>
+</div>

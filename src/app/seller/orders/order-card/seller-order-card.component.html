@@ -1,0 +1,41 @@
+<div class="order-card" role="button" tabindex="0" (click)="onOpen()" (keyup.enter)="onOpen()">
+  <div class="order-card__top">
+    @if (order.productImageUrl) {
+      <img class="order-card__thumb" [src]="fileUrl(order.productImageUrl)" [alt]="order.productName" (click)="openImage($event)" />
+    } @else {
+      <div class="order-card__thumb order-card__thumb--placeholder">
+        <mat-icon>image</mat-icon>
+      </div>
+    }
+
+    <div class="order-card__info">
+      <h3 class="order-card__name">{{ order.productName }}</h3>
+      <div class="order-card__meta">
+        <span class="order-card__date">
+          <mat-icon>calendar_today</mat-icon>
+          {{ order.createdAt | date: 'MMM d' }}
+        </span>
+        <span class="order-card__qty">&times;{{ order.quantity }}</span>
+      </div>
+      @if (order.maskedCustomerName) {
+        <span class="order-card__customer">{{ order.maskedCustomerName }}</span>
+      }
+    </div>
+
+    <div class="order-card__prices">
+      <span class="order-card__amount">{{ formatCurrency(order.amount) }}</span>
+      <span class="order-card__profit">
+        <mat-icon>arrow_upward</mat-icon>
+        {{ formatCurrency(order.profit) }}
+      </span>
+    </div>
+  </div>
+
+  <div class="order-card__bottom">
+    <span class="order-status-pill" [class]="statusClass()">
+      <span class="order-status-pill__dot"></span>
+      {{ statusLabel() }}
+    </span>
+    <span class="order-card__chevron"><mat-icon>expand_more</mat-icon></span>
+  </div>
+</div>

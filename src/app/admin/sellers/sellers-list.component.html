@@ -1,0 +1,428 @@
+<div class="list-page scroll-fixed">
+  <div class="list-page__header">
+    <h1>Sellers</h1>
+    <app-results-pill [count]="totalCount()"></app-results-pill>
+  </div>
+
+  <div class="sellers-list__filters-row">
+    <mat-button-toggle-group [value]="filterValue()" (change)="setFilter($event.value)">
+      <mat-button-toggle value="All">All statuses</mat-button-toggle>
+      @for (status of statuses; track status) {
+        <mat-button-toggle [value]="status">{{ statusLabel(status) }}</mat-button-toggle>
+      }
+      <mat-button-toggle value="Deleted">Deleted</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <div class="sellers-list__search">
+      <mat-icon>search</mat-icon>
+      <input type="text" placeholder="Search by name, store or email..." [value]="search()" (input)="onSearchInput($any($event.target).value)" />
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="list-page__loading">
+      <mat-spinner diameter="28"></mat-spinner>
+    </div>
+  } @else {
+    <div class="list-page__table-wrap">
+      <div class="scroll-area">
+        <table mat-table [dataSource]="sellers()" class="list-table">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let s">{{ s.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let s">
+              <div class="seller-copy-cell">
+                <span>{{ s.email }}</span>
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="seller-copy-btn"
+                  title="Copy email"
+                  aria-label="Copy email"
+                  (click)="copyToClipboard(s.email, 'Email')"
+                >
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="storeName">
+            <th mat-header-cell *matHeaderCellDef>Store</th>
+            <td mat-cell *matCellDef="let s">{{ s.storeName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="password">
+            <th mat-header-cell *matHeaderCellDef>Password</th>
+            <td mat-cell *matCellDef="let s">
+              <div class="seller-copy-cell">
+                <span>{{ s.password }}</span>
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="seller-copy-btn"
+                  title="Copy password"
+                  aria-label="Copy password"
+                  (click)="copyToClipboard(s.password, 'Password')"
+                >
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="transactionPassword">
+            <th mat-header-cell *matHeaderCellDef>Transaction Password</th>
+            <td mat-cell *matCellDef="let s">
+              <div class="seller-copy-cell">
+                <span>{{ s.transactionPassword }}</span>
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="seller-copy-btn"
+                  title="Copy transaction password"
+                  aria-label="Copy transaction password"
+                  (click)="copyToClipboard(s.transactionPassword, 'Transaction password')"
+                >
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let s">
+              <div class="seller-status-cell">
+                @if (s.status === 'PendingKyc') {
+                  <button type="button" class="seller-status-cell__kyc-btn" (click)="openSellerDetail(s, true)" title="Review KYC">
+                    <app-status-badge [status]="s.status"></app-status-badge>
+                  </button>
+                } @else {
+                  <app-status-badge [status]="s.status"></app-status-badge>
+                }
+                @if (s.isWithdrawalsBlocked) {
+                <span class="seller-flag seller-flag--red" title="Withdrawals blocked">
+                  <mat-icon>money_off</mat-icon>
+                </span>
+                }
+                @if (s.isBoosted) {
+                <span class="seller-flag seller-flag--indigo" title="Views boosted">
+                  <mat-icon>bolt</mat-icon>
+                </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="verified">
+            <th mat-header-cell *matHeaderCellDef>Verified</th>
+            <td mat-cell *matCellDef="let s"><app-verified-badge [verified]="s.isVerified"></app-verified-badge></td>
+          </ng-container>
+
+          <ng-container matColumnDef="balance">
+            <th mat-header-cell *matHeaderCellDef>Balance</th>
+            <td mat-cell *matCellDef="let s">
+              <div class="seller-balance-cell">
+                <span>{{ s.balance | currency }}</span>
+                <span class="seller-balance-cell__sub">Guarantee: {{ s.guaranteeBalance | currency }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>Joined</th>
+            <td mat-cell *matCellDef="let s">{{ s.createdAt | date: 'mediumDate' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef title="Actions">Actions</th>
+            <td mat-cell *matCellDef="let s">
+              <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Account Actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                @if (s.isDeleted) {
+                <div class="seller-menu-section">RISK CONTROLS</div>
+                <button mat-menu-item class="seller-menu-item--amber" (click)="restoreStore(s)">
+                  <mat-icon>restore</mat-icon>
+                  Restore Store
+                </button>
+                } @else {
+                <div class="seller-menu-section">ACCOUNT ACTIONS</div>
+                <button mat-menu-item (click)="openSellerDetail(s)">
+                  <mat-icon>account_balance</mat-icon>
+                  Bank Details &amp; KYC
+                </button>
+                <button mat-menu-item (click)="openSendNotification(s)">
+                  <mat-icon>campaign</mat-icon>
+                  Send Notification
+                </button>
+                <button mat-menu-item (click)="openAllNotifications(s)">
+                  <mat-icon>notifications</mat-icon>
+                  All Notifications
+                </button>
+                <button mat-menu-item (click)="openLoginHistory(s)">
+                  <mat-icon>history</mat-icon>
+                  Login History
+                </button>
+
+                <div class="seller-menu-section">SECURITY</div>
+                <button mat-menu-item (click)="openResetPassword(s)">
+                  <mat-icon>lock_reset</mat-icon>
+                  Reset Password
+                </button>
+                <button mat-menu-item (click)="openResetTransactionPassword(s)">
+                  <mat-icon>password</mat-icon>
+                  Reset Transaction Password
+                </button>
+
+                <div class="seller-menu-section">FINANCIALS</div>
+                <button mat-menu-item (click)="openAdjustBalance(s)">
+                  <mat-icon>account_balance_wallet</mat-icon>
+                  Adjust Balance
+                </button>
+                <button mat-menu-item (click)="openCreditScore(s)">
+                  <mat-icon>credit_score</mat-icon>
+                  Credit Score
+                </button>
+
+                <div class="seller-menu-section">SHOP SETTINGS</div>
+                <button mat-menu-item (click)="openProductLimit(s)">
+                  <mat-icon>inventory_2</mat-icon>
+                  Product Limit
+                </button>
+                <button mat-menu-item (click)="openRating(s)">
+                  <mat-icon>star</mat-icon>
+                  Rating
+                </button>
+
+                <div class="seller-menu-section">RISK CONTROLS</div>
+                @if (s.status === 'Suspended') {
+                <button mat-menu-item class="seller-menu-item--amber" (click)="unsuspendAccount(s)">
+                  <mat-icon>check_circle</mat-icon>
+                  Activate Account
+                </button>
+                } @else {
+                <button mat-menu-item class="seller-menu-item--amber" (click)="suspendAccount(s)">
+                  <mat-icon>block</mat-icon>
+                  Suspend Account
+                </button>
+                }
+                @if (s.isWithdrawalsBlocked) {
+                <button mat-menu-item class="seller-menu-item--amber" (click)="unblockWithdrawals(s)">
+                  <mat-icon>check_circle</mat-icon>
+                  Unblock Withdrawals
+                </button>
+                } @else {
+                <button mat-menu-item class="seller-menu-item--amber" (click)="blockWithdrawals(s)">
+                  <mat-icon>money_off</mat-icon>
+                  Block Withdrawals
+                </button>
+                }
+                <button mat-menu-item class="seller-menu-item--red" (click)="deleteStore(s)">
+                  <mat-icon>delete_forever</mat-icon>
+                  Delete Store
+                </button>
+                }
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+
+      @if (sellers().length === 0) {
+        <p class="list-page__empty">
+          @if (search()) {
+            No sellers match "{{ search() }}".
+          } @else {
+            {{ showDeleted() ? 'No deleted sellers.' : 'No sellers yet.' }}
+          }
+        </p>
+      }
+      </div>
+
+      <div class="list-cards">
+        @for (s of sellers(); track s.id) {
+          <div class="list-card">
+            <div class="list-card__header">
+              <span>{{ s.name }} <app-verified-badge [verified]="s.isVerified"></app-verified-badge></span>
+              <div class="seller-status-cell">
+                @if (s.status === 'PendingKyc') {
+                  <button type="button" class="seller-status-cell__kyc-btn" (click)="openSellerDetail(s, true)" title="Review KYC">
+                    <app-status-badge [status]="s.status"></app-status-badge>
+                  </button>
+                } @else {
+                  <app-status-badge [status]="s.status"></app-status-badge>
+                }
+                @if (s.isWithdrawalsBlocked) {
+                  <span class="seller-flag seller-flag--red" title="Withdrawals blocked">
+                    <mat-icon>money_off</mat-icon>
+                  </span>
+                }
+                @if (s.isBoosted) {
+                  <span class="seller-flag seller-flag--indigo" title="Views boosted">
+                    <mat-icon>bolt</mat-icon>
+                  </span>
+                }
+              </div>
+            </div>
+            <div class="list-card__row">
+              <span class="list-card__label">Store</span>
+              <span class="list-card__value">{{ s.storeName }}</span>
+            </div>
+            <div class="list-card__row">
+              <span class="list-card__label">Email</span>
+              <div class="seller-copy-cell">
+                <span class="list-card__value">{{ s.email }}</span>
+                <button type="button" mat-icon-button class="seller-copy-btn" title="Copy email" aria-label="Copy email" (click)="copyToClipboard(s.email, 'Email')">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="list-card__row">
+              <span class="list-card__label">Password</span>
+              <div class="seller-copy-cell">
+                <span class="list-card__value">{{ s.password }}</span>
+                <button type="button" mat-icon-button class="seller-copy-btn" title="Copy password" aria-label="Copy password" (click)="copyToClipboard(s.password, 'Password')">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="list-card__row">
+              <span class="list-card__label">Transaction Password</span>
+              <div class="seller-copy-cell">
+                <span class="list-card__value">{{ s.transactionPassword }}</span>
+                <button type="button" mat-icon-button class="seller-copy-btn" title="Copy transaction password" aria-label="Copy transaction password" (click)="copyToClipboard(s.transactionPassword, 'Transaction password')">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="list-card__row">
+              <span class="list-card__label">Balance</span>
+              <span class="list-card__value">{{ s.balance | currency }} (Guarantee {{ s.guaranteeBalance | currency }})</span>
+            </div>
+            <div class="list-card__row">
+              <span class="list-card__label">Joined</span>
+              <span class="list-card__value">{{ s.createdAt | date: 'mediumDate' }}</span>
+            </div>
+            <div class="list-card__actions">
+              <button mat-icon-button [matMenuTriggerFor]="cardMenu" aria-label="Account Actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #cardMenu="matMenu">
+                @if (s.isDeleted) {
+                  <div class="seller-menu-section">RISK CONTROLS</div>
+                  <button mat-menu-item class="seller-menu-item--amber" (click)="restoreStore(s)">
+                    <mat-icon>restore</mat-icon>
+                    Restore Store
+                  </button>
+                } @else {
+                  <div class="seller-menu-section">ACCOUNT ACTIONS</div>
+                  <button mat-menu-item (click)="openSellerDetail(s)">
+                    <mat-icon>account_balance</mat-icon>
+                    Bank Details &amp; KYC
+                  </button>
+                  <button mat-menu-item (click)="openSendNotification(s)">
+                    <mat-icon>campaign</mat-icon>
+                    Send Notification
+                  </button>
+                  <button mat-menu-item (click)="openAllNotifications(s)">
+                    <mat-icon>notifications</mat-icon>
+                    All Notifications
+                  </button>
+                  <button mat-menu-item (click)="openLoginHistory(s)">
+                    <mat-icon>history</mat-icon>
+                    Login History
+                  </button>
+
+                  <div class="seller-menu-section">SECURITY</div>
+                  <button mat-menu-item (click)="openResetPassword(s)">
+                    <mat-icon>lock_reset</mat-icon>
+                    Reset Password
+                  </button>
+                  <button mat-menu-item (click)="openResetTransactionPassword(s)">
+                    <mat-icon>password</mat-icon>
+                    Reset Transaction Password
+                  </button>
+
+                  <div class="seller-menu-section">FINANCIALS</div>
+                  <button mat-menu-item (click)="openAdjustBalance(s)">
+                    <mat-icon>account_balance_wallet</mat-icon>
+                    Adjust Balance
+                  </button>
+                  <button mat-menu-item (click)="openCreditScore(s)">
+                    <mat-icon>credit_score</mat-icon>
+                    Credit Score
+                  </button>
+
+                  <div class="seller-menu-section">SHOP SETTINGS</div>
+                  <button mat-menu-item (click)="openProductLimit(s)">
+                    <mat-icon>inventory_2</mat-icon>
+                    Product Limit
+                  </button>
+                  <button mat-menu-item (click)="openRating(s)">
+                    <mat-icon>star</mat-icon>
+                    Rating
+                  </button>
+
+                  <div class="seller-menu-section">RISK CONTROLS</div>
+                  @if (s.status === 'Suspended') {
+                    <button mat-menu-item class="seller-menu-item--amber" (click)="unsuspendAccount(s)">
+                      <mat-icon>check_circle</mat-icon>
+                      Activate Account
+                    </button>
+                  } @else {
+                    <button mat-menu-item class="seller-menu-item--amber" (click)="suspendAccount(s)">
+                      <mat-icon>block</mat-icon>
+                      Suspend Account
+                    </button>
+                  }
+                  @if (s.isWithdrawalsBlocked) {
+                    <button mat-menu-item class="seller-menu-item--amber" (click)="unblockWithdrawals(s)">
+                      <mat-icon>check_circle</mat-icon>
+                      Unblock Withdrawals
+                    </button>
+                  } @else {
+                    <button mat-menu-item class="seller-menu-item--amber" (click)="blockWithdrawals(s)">
+                      <mat-icon>money_off</mat-icon>
+                      Block Withdrawals
+                    </button>
+                  }
+                  <button mat-menu-item class="seller-menu-item--red" (click)="deleteStore(s)">
+                    <mat-icon>delete_forever</mat-icon>
+                    Delete Store
+                  </button>
+                }
+              </mat-menu>
+            </div>
+          </div>
+        }
+        @if (sellers().length === 0) {
+          <p class="list-page__empty">
+            @if (search()) {
+              No sellers match "{{ search() }}".
+            } @else {
+              {{ showDeleted() ? 'No deleted sellers.' : 'No sellers yet.' }}
+            }
+          </p>
+        }
+      </div>
+    </div>
+
+    <app-pager [page]="page()" [totalPages]="totalPages()" [totalCount]="totalCount()" (pageChange)="onPageChange($event)"></app-pager>
+  }
+</div>

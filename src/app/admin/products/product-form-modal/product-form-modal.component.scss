@@ -1,0 +1,86 @@
+@forward '../../../shared/styles/dialog-form';
+@use '../../../shared/styles/thumbnails' as thumb;
+
+// Overrides the forwarded partial's :host/.bank-modal so this dialog holds a constant height
+// (set on the MatDialogConfig in products-list.component.ts) whether or not the optional
+// description/current-image/error blocks are present — only the body scrolls, header and the
+// Cancel/Save footer stay pinned in place.
+:host {
+  height: 100%;
+}
+
+.bank-modal {
+  height: 100%;
+  min-height: 0;
+}
+
+.bank-modal__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.bank-modal__footer {
+  flex: none;
+}
+
+.bank-modal__optional {
+  font-weight: 400;
+  color: var(--ecom-text-muted);
+}
+
+.product-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.product-form__checkbox {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+
+  input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    flex: none;
+  }
+
+  span {
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: var(--ecom-text);
+  }
+}
+
+.product-form__error {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--ecom-red);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.product-form__current-image {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--ecom-text-muted);
+
+  img {
+    @include thumb.thumb-row;
+    @include thumb.thumb-clickable;
+    border: 1px solid var(--ecom-border);
+  }
+}
+
+@media (max-width: 480px) {
+  .product-form__row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,67 @@
+@if (loading()) {
+  <div class="dashboard-loading">
+    <mat-spinner diameter="32"></mat-spinner>
+  </div>
+} @else {
+  <div class="dashboard">
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (summary() && summary()!.pendingKycSellers > 0 && !bannerDismissed()) {
+      <a class="dashboard__banner" routerLink="/admin/kyc">
+        <mat-icon>info</mat-icon>
+        <span>{{ summary()!.pendingKycSellers }} seller(s) awaiting KYC review.</span>
+        <button mat-button (click)="$event.stopPropagation(); $event.preventDefault(); bannerDismissed.set(true)">Dismiss</button>
+      </a>
+    }
+
+    <div class="dashboard__stats">
+      <app-stat-card
+        class="dashboard__stat--featured"
+        icon="account_balance_wallet"
+        label="Sellers' Total Balance"
+        [value]="formatCurrency(summary()?.totalSellerBalance)"
+        [featured]="true"
+        [live]="true"
+      ></app-stat-card>
+      <app-stat-card icon="storefront" label="Total Sellers" [value]="(summary()?.totalSellers ?? 0).toString()"></app-stat-card>
+      <app-stat-card icon="local_shipping" label="Active Deliveries" [value]="(summary()?.inTransitDeliveries ?? 0).toString()"></app-stat-card>
+      <app-stat-card icon="support_agent" label="Total Tickets" [value]="(summary()?.totalTickets ?? 0).toString()"></app-stat-card>
+    </div>
+
+    <div class="dashboard__stats dashboard__stats--compact">
+      <app-stat-card accent="amber" icon="schedule" label="Pending Orders" [value]="(summary()?.pendingDeliveries ?? 0).toString()"></app-stat-card>
+      <app-stat-card accent="amber" icon="local_shipping" label="In Delivery" [value]="(summary()?.inTransitDeliveries ?? 0).toString()"></app-stat-card>
+      <app-stat-card accent="green" icon="task_alt" label="Completed Orders" [value]="(summary()?.completedDeliveries ?? 0).toString()"></app-stat-card>
+      <app-stat-card accent="amber" icon="payments" label="Pending Withdrawals" [value]="(summary()?.pendingWithdrawals ?? 0).toString()"></app-stat-card>
+      <app-stat-card accent="amber" icon="add_card" label="Pending Recharges" [value]="(summary()?.pendingRecharges ?? 0).toString()"></app-stat-card>
+      <app-stat-card icon="widgets" label="Products in Stores" [value]="(summary()?.totalProductsInStores ?? 0).toString()"></app-stat-card>
+    </div>
+
+    <div class="dashboard__panels">
+      <div class="dashboard__chart-panel">
+        <h3>Revenue (last 7 days)</h3>
+        <app-revenue-chart [points]="revenue()"></app-revenue-chart>
+      </div>
+      <app-activity-log class="dashboard__activity-panel"></app-activity-log>
+    </div>
+
+    @if (summary() && summary()!.stageDistribution.length > 0) {
+      <div class="dashboard__stage-panel">
+        <h3>Sellers by Order Stage</h3>
+        <div class="dashboard__stage-row">
+          @for (s of summary()!.stageDistribution; track s.stageNumber) {
+            <div class="dashboard__stage-chip">
+              <span class="dashboard__stage-chip-number">Stage {{ s.stageNumber }}</span>
+              <span class="dashboard__stage-chip-count">{{ s.sellerCount }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

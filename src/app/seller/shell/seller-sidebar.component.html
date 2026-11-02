@@ -1,0 +1,143 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__logo"><mat-icon>shopping_cart</mat-icon></div>
+      <div class="sidebar__brand-text">
+        <span class="sidebar__store-name">{{ storeName() ?? '—' }}</span>
+        <span class="sidebar__seller-name">{{ sellerName() ?? 'Seller' }} <app-verified-badge [verified]="isVerified()"></app-verified-badge></span>
+      </div>
+    </div>
+
+    <div class="sidebar__balance-card">
+      <span class="sidebar__balance-label">SHOP BALANCE</span>
+      <span class="sidebar__balance-value">{{ formatCurrency(balance()) }}</span>
+      <span class="sidebar__balance-sub">Guarantee: {{ formatCurrency(guaranteeBalance()) }}</span>
+      <a class="sidebar__topup-btn" routerLink="/seller/topup">
+        <mat-icon>add</mat-icon>
+        Top Up
+      </a>
+    </div>
+
+    <nav class="sidebar__nav">
+      <a class="sidebar__link" routerLink="/seller/dashboard" routerLinkActive="sidebar__link--active">
+        <mat-icon>grid_view</mat-icon>
+        <span>Dashboard</span>
+      </a>
+
+      <a
+        class="sidebar__link"
+        [class.sidebar__link--locked]="!kycApproved()"
+        routerLink="/seller/products"
+        routerLinkActive="sidebar__link--active"
+        [title]="kycApproved() ? '' : 'Requires KYC approval'"
+      >
+        <mat-icon>inventory_2</mat-icon>
+        <span>Products</span>
+        @if (!kycApproved()) {
+          <mat-icon class="sidebar__lock">lock</mat-icon>
+        }
+      </a>
+
+      <a
+        class="sidebar__link"
+        [class.sidebar__link--locked]="!kycApproved()"
+        routerLink="/seller/orders"
+        routerLinkActive="sidebar__link--active"
+        [title]="kycApproved() ? '' : 'Requires KYC approval'"
+      >
+        <mat-icon>shopping_cart</mat-icon>
+        <span>Orders</span>
+        @if (!kycApproved()) {
+          <mat-icon class="sidebar__lock">lock</mat-icon>
+        } @else if (pendingOrders() > 0) {
+          <span class="sidebar__badge">{{ pendingOrders() }}</span>
+        }
+      </a>
+
+      <a class="sidebar__link" routerLink="/seller/topup" routerLinkActive="sidebar__link--active">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <span>Top Up</span>
+      </a>
+
+      <a class="sidebar__link" routerLink="/seller/withdraw" routerLinkActive="sidebar__link--active">
+        <mat-icon>north_east</mat-icon>
+        <span>Withdraw</span>
+      </a>
+
+      <app-notification-bell variant="sidebar-link" label="Notifications"></app-notification-bell>
+
+      <a class="sidebar__link" routerLink="/seller/chat" routerLinkActive="sidebar__link--active">
+        <mat-icon>chat</mat-icon>
+        <span>Chat</span>
+        @if (chatService.unreadCount() > 0) {
+          <span class="sidebar__badge">{{ chatService.unreadCount() }}</span>
+        }
+      </a>
+
+      <a class="sidebar__link" routerLink="/seller/home" routerLinkActive="sidebar__link--active">
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+    <button type="button" class="sidebar__signout" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Sign out</span>
+    </button>
+  </aside>
+
+  <main class="content">
+    @if (isNavigating()) {
+      <div class="nav-progress" aria-hidden="true"></div>
+    }
+    <router-outlet></router-outlet>
+  </main>
+
+  <nav class="mobile-tabbar">
+    <a class="mobile-tabbar__link" routerLink="/seller/dashboard" routerLinkActive="mobile-tabbar__link--active">
+      <mat-icon>grid_view</mat-icon>
+      <span>Dashboard</span>
+    </a>
+    <a
+      class="mobile-tabbar__link"
+      [class.mobile-tabbar__link--locked]="!kycApproved()"
+      routerLink="/seller/products"
+      routerLinkActive="mobile-tabbar__link--active"
+      [title]="kycApproved() ? '' : 'Requires KYC approval'"
+    >
+      <mat-icon>{{ kycApproved() ? 'inventory_2' : 'lock' }}</mat-icon>
+      <span>Products</span>
+    </a>
+    <a
+      class="mobile-tabbar__link"
+      [class.mobile-tabbar__link--locked]="!kycApproved()"
+      routerLink="/seller/orders"
+      routerLinkActive="mobile-tabbar__link--active"
+      [title]="kycApproved() ? '' : 'Requires KYC approval'"
+    >
+      <mat-icon>{{ kycApproved() ? 'shopping_bag' : 'lock' }}</mat-icon>
+      <span>Orders</span>
+      @if (kycApproved() && pendingOrders() > 0) {
+        <span class="mobile-tabbar__badge">{{ pendingOrders() }}</span>
+      }
+    </a>
+    <app-notification-bell variant="tab-bar" label="Notifications"></app-notification-bell>
+    <a class="mobile-tabbar__link" routerLink="/seller/home" routerLinkActive="mobile-tabbar__link--active">
+      <mat-icon>person</mat-icon>
+      <span>Profile</span>
+    </a>
+  </nav>
+
+  <!-- Global floating chat launcher — lives at the shell level (not inside <router-outlet>) so it
+       persists across every Seller Portal page without remounting or losing chatService's live
+       connection/unread state. Hidden on the Chat page itself, where opening "chat" from within chat
+       would be redundant. -->
+  @if (!onChatPage()) {
+    <button type="button" class="fab" aria-label="Chat with support" (click)="goToChat()">
+      <mat-icon>chat</mat-icon>
+      @if (chatService.unreadCount() > 0) {
+        <span class="fab__badge">{{ chatService.unreadCount() }}</span>
+      }
+    </button>
+  }
+</div>

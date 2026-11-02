@@ -1,0 +1,33 @@
+<div class="fin-modal">
+  <header class="fin-modal__header">
+    <h2>Product Limit</h2>
+    <p>{{ data.storeName }} — current limit: <strong>{{ data.currentLimit }}</strong></p>
+  </header>
+
+  <div class="fin-modal__body">
+    <div class="fin-modal__toggle">
+      <button type="button" class="fin-modal__toggle-btn" [class.fin-modal__toggle-btn--active]="direction() === 'increase'" (click)="direction.set('increase')">
+        Increase
+      </button>
+      <button type="button" class="fin-modal__toggle-btn" [class.fin-modal__toggle-btn--active]="direction() === 'decrease'" (click)="direction.set('decrease')">
+        Decrease
+      </button>
+    </div>
+
+    <label class="fin-modal__field">
+      <span>Amount</span>
+      <div class="fin-modal__amount">
+        <input type="number" min="1" step="1" placeholder="0" [value]="amount() ?? ''" (input)="onAmountInput($any($event.target).value)" />
+      </div>
+    </label>
+
+    @if (amount()) {
+      <p class="fin-modal__preview">New product limit will be <strong>{{ resultingValue() }}</strong></p>
+    }
+  </div>
+
+  <footer class="fin-modal__footer">
+    <button type="button" class="fin-modal__btn fin-modal__btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="fin-modal__btn fin-modal__btn--solid" [disabled]="!canApply()" (click)="apply()">Apply</button>
+  </footer>
+</div>

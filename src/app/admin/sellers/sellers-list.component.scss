@@ -1,0 +1,290 @@
+// Layout styles for this screen live in the global .list-page utility classes (src/styles.scss).
+@use '../../shared/styles/breakpoints' as bp;
+@use '../../shared/styles/status-tabs' as status-tabs;
+
+// Desktop keeps the original <table mat-table> (.list-table/.scroll-area, global styles.scss); mobile
+// keeps the .list-card stack (.list-cards, global styles.scss) — the global @include bp.mobile toggle
+// in styles.scss switches between them below the mobile breakpoint. Restored per an explicit request
+// to keep the desktop grid as a single-row table exactly as it was, with mobile handled independently
+// via that same breakpoint toggle rather than one unconditional list at every viewport size.
+
+// Title (.list-page__header, global) / filters row (toggles + search sharing one line, search
+// pushed to the row's end via margin-left: auto, same treatment as kyc-review.component.scss).
+// Active/Deleted and the status filter used to be two separate toggle groups here (putting "Active"
+// on screen twice and forcing this row to wrap onto two lines on phone widths); they're now one
+// combined group.
+.sellers-list__filters-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+  min-width: 0;
+
+  mat-button-toggle-group {
+    @include status-tabs.dark-blue-toggle-group;
+  }
+}
+
+// Search box recipe matches admin ProductsListComponent's .products-list__search exactly, for
+// visual consistency between the two list-page search boxes.
+.sellers-list__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  margin-left: auto;
+  border-radius: 8px;
+  border: 1px solid var(--ecom-border);
+  background: var(--ecom-surface-alt);
+  max-width: 280px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--ecom-text-muted);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.85rem;
+    color: var(--ecom-text);
+    font-family: inherit;
+
+    &::placeholder {
+      color: var(--ecom-text-muted);
+    }
+  }
+
+  &:focus-within {
+    border-color: var(--ecom-indigo);
+  }
+}
+
+@include bp.mobile {
+  .sellers-list__search {
+    // On mobile the toggle strip already fills the row, so the search box wraps onto its own line —
+    // flex-basis 100% makes it a full-width bar there instead of shrinking to content size.
+    max-width: none;
+    flex: 1 1 100%;
+  }
+}
+
+// The shared .list-table/.list-page__table-wrap styles (src/styles.scss) use a very faint border and
+// a muted-gray header color app-wide. Per request, this page's table border and column header row are
+// filled with the same dark-blue tone as the admin dashboard's first widget and KYC Review Queue —
+// scoped to this page only, not a global change to every other list-table screen.
+.list-page__table-wrap {
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.list-table th.mat-mdc-header-cell {
+  background: #0c1e3f;
+  color: #ffffff;
+  border-bottom-color: rgba(59, 130, 246, 0.35);
+}
+
+.seller-status-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+// Wraps the status badge only for PendingKyc rows — opens the KYC Approve/Reject dialog directly.
+// Plain badge otherwise (see sellers-list.component.html), so this reset only ever applies where the
+// badge is actually a button.
+.seller-status-cell__kyc-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 999px;
+
+  &:hover app-status-badge,
+  &:focus-visible app-status-badge {
+    filter: brightness(1.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ecom-indigo);
+    outline-offset: 2px;
+  }
+}
+
+.seller-flag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &--red {
+    background: rgba(239, 68, 68, 0.14);
+    color: var(--ecom-red);
+  }
+
+  &--indigo {
+    background: rgba(99, 102, 241, 0.14);
+    color: var(--ecom-indigo);
+  }
+}
+
+// Email/Password cells — value plus a small copy icon that only needs to be reachable, not loud. Used
+// inside both the desktop table's <td> and the mobile .list-card row, so the base rule here is exactly
+// the original desktop appearance (untouched); the mobile-only truncation/alignment fix below is
+// scoped to bp.mobile so it can never affect the desktop table.
+.seller-copy-cell {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@include bp.mobile {
+  // min-width:0/flex:1 (not the default flex:0-auto content size) is what lets the value actually
+  // shrink and ellipsis inside a .list-card__row's fixed width — without it, a long email or generated
+  // password refused to shrink and pushed the copy button off-alignment / the row into overflow on
+  // narrow phone widths instead of truncating cleanly like every other .list-card__value does.
+  .seller-copy-cell {
+    justify-content: flex-end;
+    flex: 1;
+    min-width: 0;
+
+    > span {
+      min-width: 0;
+    }
+  }
+}
+
+.seller-copy-btn {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  color: var(--ecom-text-muted);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+  }
+
+  &:hover {
+    color: var(--ecom-indigo);
+  }
+
+  @include bp.mobile {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+  }
+}
+
+// Seller category badge (Admin Sellers table) — a manual override shows a small lock icon next to it
+// so admins can tell at a glance which sellers won't be recalculated automatically.
+.seller-category-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  &--silver {
+    background: rgba(148, 163, 184, 0.18);
+    color: #94a3b8;
+  }
+
+  &--gold {
+    background: rgba(234, 179, 8, 0.16);
+    color: #eab308;
+  }
+
+  &--diamond {
+    background: rgba(56, 189, 248, 0.16);
+    color: #38bdf8;
+  }
+
+  &--platinum {
+    background: rgba(168, 85, 247, 0.16);
+    color: #a855f7;
+  }
+}
+
+.seller-category-manual {
+  margin-left: 5px;
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+  vertical-align: middle;
+  color: var(--ecom-text-muted);
+}
+
+// Seller classification badge — separate from the category badge above; Normal is neutral, VIP is
+// highlighted to match the visual weight of the higher category tiers.
+.seller-classification-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(148, 163, 184, 0.18);
+  color: #94a3b8;
+
+  &--vip {
+    background: rgba(234, 179, 8, 0.16);
+    color: #eab308;
+  }
+}
+
+.seller-balance-cell {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.seller-balance-cell__sub {
+  font-size: 0.74rem;
+  color: var(--ecom-text-muted);
+}
+
+// mat-menu section labels — non-interactive, just a visual grouping divider.
+.seller-menu-section {
+  padding: 8px 16px 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ecom-text-muted);
+}
+
+.seller-menu-item--amber mat-icon {
+  color: var(--ecom-amber);
+}
+
+.seller-menu-item--red {
+  color: var(--ecom-red);
+
+  mat-icon {
+    color: var(--ecom-red);
+  }
+}

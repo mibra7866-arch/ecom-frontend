@@ -1,0 +1,243 @@
+// Header/close chrome and the __row3 "label above value" cell layout deliberately mirror
+// order-create-for-seller-dialog / seller-order-detail.component.scss — same dialog chrome and info-row
+// language reused rather than reinvented for this third order-related dialog.
+@use '../../../shared/styles/thumbnails' as thumb;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+}
+
+.order-detail-dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 90vh;
+}
+
+.order-detail-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px 0;
+  flex: none;
+
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+}
+
+.order-detail-dialog__close {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+  }
+}
+
+.order-detail-dialog__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 24px 20px;
+}
+
+.order-detail-dialog__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.order-detail-dialog__thumb {
+  @include thumb.thumb-row;
+}
+
+img.order-detail-dialog__thumb {
+  @include thumb.thumb-clickable;
+}
+
+.order-detail-dialog__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  h3 {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.order-detail-dialog__meta {
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+}
+
+.order-detail-dialog__prices {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.order-detail-dialog__amount {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.order-detail-dialog__profit {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ecom-green);
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+  }
+}
+
+.order-detail-dialog__status-row {
+  display: flex;
+}
+
+.order-detail-dialog__row3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ecom-border);
+}
+
+.order-detail-dialog__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.order-detail-dialog__cell-label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ecom-text-muted);
+}
+
+.order-detail-dialog__cell-value {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--ecom-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-detail-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ecom-text-muted);
+  padding-top: 14px;
+  border-top: 1px solid var(--ecom-border);
+
+  select {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--ecom-border);
+    border-radius: 9px;
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+    font-size: 0.88rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: var(--ecom-indigo);
+    }
+  }
+}
+
+.order-detail-dialog__footer {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--ecom-border);
+}
+
+.order-detail-dialog__btn {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 9px;
+  border: none;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.order-detail-dialog__btn--secondary {
+  background: var(--ecom-surface-alt);
+  color: var(--ecom-text);
+
+  &:hover:not(:disabled) {
+    background: var(--ecom-border);
+  }
+}
+
+.order-detail-dialog__btn--primary {
+  background: var(--ecom-indigo);
+  color: #ffffff;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+}
+
+@media (max-width: 480px) {
+  .order-detail-dialog__row3 {
+    grid-template-columns: 1fr;
+  }
+}

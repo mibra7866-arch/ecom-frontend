@@ -1,0 +1,67 @@
+// Layout styles for this screen live in the global .list-page utility classes (src/styles.scss).
+
+.orders-list__header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+// Same box/icon/input spec as AdminSellersListComponent's own .sellers-list__search — reused directly
+// rather than a second search-box style, just sized to sit inline in this page's header row instead of
+// on its own line.
+.orders-list__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--ecom-border);
+  background: var(--ecom-surface-alt);
+  width: 260px;
+  max-width: 100%;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--ecom-text-muted);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.85rem;
+    color: var(--ecom-text);
+    font-family: inherit;
+
+    &::placeholder {
+      color: var(--ecom-text-muted);
+    }
+  }
+}
+
+.admin-orders__sellers {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.admin-orders__sellers-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+// The whole row opens the seller-orders modal — same "row is the click target" pattern used elsewhere
+// (e.g. seller-orders-row on the seller Orders list).
+.admin-orders__seller-row {
+  cursor: pointer;
+}

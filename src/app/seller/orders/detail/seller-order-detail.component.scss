@@ -1,0 +1,358 @@
+@use '../../../shared/styles/thumbnails' as thumb;
+@use '../../../shared/styles/breakpoints' as bp;
+
+.order-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 640px;
+}
+
+.order-detail__back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  color: var(--ecom-text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: var(--ecom-text);
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.error-banner {
+  span {
+    flex: 1;
+  }
+}
+
+.error-banner__action {
+  flex: none;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: transparent;
+  color: var(--ecom-red);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.16);
+  }
+}
+
+.order-detail__loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.order-detail__card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 14px;
+  border: 1px solid var(--ecom-border);
+  background: var(--ecom-surface);
+}
+
+// Header mirrors SellerOrderCardComponent's .order-card__top (thumb, name/date/qty, amount/profit) —
+// same visual language as the list, just at detail-page scale.
+.order-detail__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.order-detail__thumb {
+  @include thumb.thumb-row;
+}
+
+img.order-detail__thumb {
+  @include thumb.thumb-clickable;
+}
+
+.order-detail__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.order-detail__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+}
+
+.order-detail__date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.order-detail__prices {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.order-detail__amount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.order-detail__profit {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ecom-green);
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+  }
+}
+
+.order-detail__status-row {
+  display: flex;
+}
+
+// Customer/Phone/Shipping and Cost/Profit/Order — both reuse the same 3-column "label above value"
+// layout; collapses to one column on mobile so long masked addresses never force horizontal scroll.
+.order-detail__row3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ecom-border);
+}
+
+.order-detail__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.order-detail__cell-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ecom-text-muted);
+}
+
+.order-detail__cell-value {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ecom-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &--green {
+    color: var(--ecom-green);
+  }
+}
+
+// Real fulfillment progress — each step maps 1:1 to the order's actual OrderStatus (see
+// STEPPER_REACHED in the component). Not rendered at all for a Cancelled order — see
+// .order-detail__cancelled below, shown in its place.
+.order-detail__stepper {
+  display: flex;
+  align-items: flex-start;
+  list-style: none;
+  margin: 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--ecom-border);
+}
+
+.order-detail__step {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 13px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--ecom-border);
+    z-index: 0;
+  }
+
+  &--done:not(:last-child)::after {
+    background: var(--ecom-indigo);
+  }
+}
+
+.order-detail__step-circle {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ecom-surface-alt);
+  border: 2px solid var(--ecom-border);
+  color: var(--ecom-text-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.order-detail__step--done .order-detail__step-circle {
+  background: var(--ecom-indigo);
+  border-color: var(--ecom-indigo);
+  color: #ffffff;
+}
+
+.order-detail__step-label {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--ecom-text-muted);
+  max-width: 76px;
+}
+
+.order-detail__step--done .order-detail__step-label {
+  color: var(--ecom-text);
+}
+
+// Replaces the stepper entirely for a Cancelled order — it never reached Accepted, so there's no
+// progress to show a position within.
+.order-detail__cancelled {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ecom-border);
+  color: var(--ecom-text-muted);
+  font-weight: 600;
+  font-size: 0.88rem;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.order-detail__action {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ecom-border);
+}
+
+.order-detail__btn {
+  height: 42px;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.order-detail__btn--accept {
+  background: var(--ecom-indigo);
+  color: #ffffff;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+}
+
+.order-detail__note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ecom-border);
+  color: var(--ecom-indigo);
+  font-weight: 600;
+  font-size: 0.88rem;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  &--muted {
+    color: var(--ecom-text-muted);
+  }
+}
+
+.order-detail__done {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ecom-border);
+  color: var(--ecom-green);
+  font-weight: 600;
+}
+
+@include bp.mobile {
+  .order-detail__row3 {
+    grid-template-columns: 1fr;
+  }
+
+  .order-detail__step-label {
+    max-width: 56px;
+  }
+}

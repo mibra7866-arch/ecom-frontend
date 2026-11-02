@@ -1,0 +1,479 @@
+@use '../../shared/styles/breakpoints' as bp;
+
+// height (not min-height) so .content's flex:1 + overflow-y:auto below actually has a bounded box to
+// scroll within — with only min-height, .shell grew to fit its tallest child instead of clipping at the
+// viewport, so .content's own overflow never triggered and the whole document scrolled instead (e.g.
+// the seller Chat page's message list, which wants to scroll internally, not the page around it).
+// dvh (not vh) so mobile Safari/Chrome's address-bar show/hide doesn't jump the layout.
+.shell {
+  display: flex;
+  height: 100dvh;
+  background: var(--ecom-bg);
+}
+
+.sidebar {
+  flex: none;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 18px;
+  background: var(--ecom-surface);
+  border-right: 1px solid var(--ecom-border);
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow-y: auto;
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px;
+}
+
+.sidebar__logo {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #0f1f3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    color: #ffffff;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.sidebar__brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.sidebar__store-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ecom-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar__seller-name {
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar__balance-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 14px;
+  background: linear-gradient(160deg, #0f1f3d 0%, #14294f 100%);
+}
+
+.sidebar__balance-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.sidebar__balance-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.sidebar__balance-sub {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.sidebar__topup-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 34px;
+  margin-top: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--ecom-text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: none;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &--active {
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+    font-weight: 700;
+  }
+
+  &--disabled {
+    color: var(--ecom-text-muted);
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  &:not(&--disabled):not(&--active):hover {
+    background: var(--ecom-surface-alt);
+  }
+
+  // Products/Orders pre-KYC-approval — visual-only cue (kycApprovedGuard is the real enforcement), so
+  // the link stays clickable rather than fully disabled; clicking it just bounces back to Dashboard.
+  &--locked {
+    opacity: 0.55;
+  }
+}
+
+.sidebar__lock {
+  margin-left: auto;
+  color: var(--ecom-text-muted);
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.sidebar__badge {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar__signout {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  border-radius: 10px;
+  color: #ef4444;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.08);
+  }
+}
+
+.content {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 12px 28px 18px;
+}
+
+// Immediate feedback the instant a nav tap is received — while its route's lazy chunk (or a guard
+// like kycApprovedGuard) is still resolving, this is the only thing telling the seller their tap
+// already registered. Fixed to the viewport, not .content, so it stays visible above the fold
+// regardless of scroll position — the same "top of the window" convention as GitHub/YouTube's own
+// route-loading indicator, not a new visual language for this app.
+.nav-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 40;
+  background: var(--ecom-indigo);
+  transform-origin: left;
+  animation: nav-progress-sweep 1s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes nav-progress-sweep {
+  0% {
+    transform: scaleX(0);
+    opacity: 1;
+  }
+  60% {
+    transform: scaleX(0.75);
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+// Fixed app-style bottom tab bar — hidden above phone widths (see the bp.mobile block at the
+// bottom of this file, which is the only place it's switched on and .sidebar is switched off).
+.mobile-tabbar {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  align-items: stretch;
+  justify-content: space-around;
+  height: 60px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--ecom-surface);
+  border-top: 1px solid var(--ecom-border);
+}
+
+.mobile-tabbar__link {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 4px 4px;
+  color: var(--ecom-text-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  &--active {
+    color: var(--ecom-indigo, #6366f1);
+  }
+
+  &--locked {
+    opacity: 0.55;
+  }
+}
+
+.mobile-tabbar__badge {
+  position: absolute;
+  top: 2px;
+  right: calc(50% - 20px);
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ---------- Global floating chat launcher ----------
+// Sits at the .shell level (sibling to .content/.mobile-tabbar), not inside any one page, so it's the
+// same persistent element across every Seller Portal route.
+
+.fab {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: #14b8a6;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(20, 184, 166, 0.4);
+  z-index: 30;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  &:hover {
+    background: #0d9488;
+  }
+}
+
+// Same red/white treatment as .sidebar__badge — unread Admin messages while the seller is away from
+// the Chat page.
+.fab__badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ef4444;
+  border: 2px solid var(--ecom-bg);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .shell {
+    flex-direction: column;
+    // Sidebar becomes a non-sticky top bar here, so the page should grow/scroll normally instead of
+    // being clipped to one viewport height like the desktop layout.
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    padding-top: max(14px, env(safe-area-inset-top));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  .sidebar__balance-card {
+    order: 3;
+    flex: 1 1 100%;
+  }
+
+  .sidebar__nav {
+    order: 4;
+    flex: 1 1 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebar__link span:not(.sidebar__badge) {
+    display: none;
+  }
+
+  .sidebar__link {
+    padding: 10px;
+  }
+
+  .sidebar__signout {
+    order: 2;
+    margin-top: 0;
+    margin-left: auto;
+  }
+
+  .sidebar__signout span {
+    display: none;
+  }
+
+  .content {
+    padding: 20px;
+  }
+}
+
+// Below true phone widths, the top icon-row reflow above is replaced entirely by the fixed bottom
+// tab bar (Dashboard/Products/Orders/Notifications/Profile) — matches the reference app-style mobile
+// pattern rather than further squeezing 7 icons into a horizontal strip. Balance is already shown on
+// the Dashboard banner; Progress/Top Up/Chat/Sign out move to the Profile page (seller-home) as quick
+// links so nothing becomes unreachable.
+@include bp.mobile {
+  // Restores a definite viewport height now that .sidebar (the reason the 1024px block above relaxed
+  // this to height:auto/min-height, so a normal-flow top bar + content could grow and let the whole
+  // page scroll) is hidden and .content is the only flex child again — needed for .content's own
+  // overflow-y:auto to actually scroll internally, and for any page relying on a height:100% chain
+  // (e.g. the Chat page's message panel) to fill real space instead of collapsing to its content size.
+  .shell {
+    height: 100dvh;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .content {
+    padding: 12px 14px calc(60px + env(safe-area-inset-bottom, 0px) + 14px);
+  }
+
+  .mobile-tabbar {
+    display: flex;
+  }
+
+  // Shares the bottom-right corner with the fixed mobile tab bar — lifted clear of it plus the
+  // safe-area inset.
+  .fab {
+    right: 16px;
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+  }
+}

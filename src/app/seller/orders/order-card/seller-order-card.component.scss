@@ -1,0 +1,132 @@
+// Horizontal row layout, replacing the previous square-image grid tile — matches the reference
+// design's list-row Orders module: thumbnail + name/date/qty + amount/profit on one row, a
+// status pill + chevron on a second row underneath.
+@use '../../../shared/styles/thumbnails' as thumb;
+
+.order-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--ecom-surface-alt);
+  border: 1px solid var(--ecom-border);
+  border-radius: 16px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--ecom-indigo);
+  }
+}
+
+.order-card__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.order-card__thumb {
+  @include thumb.thumb-row;
+
+  &--placeholder mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+  }
+}
+
+img.order-card__thumb {
+  @include thumb.thumb-clickable;
+}
+
+.order-card__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-card__name {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+}
+
+.order-card__date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.order-card__customer {
+  font-size: 0.74rem;
+  color: var(--ecom-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-card__prices {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.order-card__amount {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.order-card__profit {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ecom-green);
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+  }
+}
+
+.order-card__bottom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.order-card__chevron {
+  margin-left: auto;
+  display: flex;
+  color: var(--ecom-text-muted);
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}

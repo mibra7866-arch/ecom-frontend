@@ -1,0 +1,549 @@
+@use '../../../shared/styles/status-tabs' as status-tabs;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  background: var(--ecom-surface);
+}
+
+// max-height + overflow:hidden here (rather than letting it grow and rely on MatDialog's own surface
+// to scroll) is what makes .topup-modal__body the ONE scrollable region below — without a bounded,
+// clipping parent, the body's overflow-y:auto never actually turns on (it just grows to fit its
+// content instead), so the dialog surface itself ends up scrolling as a whole with the header/footer
+// dragging along with it. Two separate, ambiguous scrollable containers is exactly what caused the
+// "needs a few swipes to actually move" feel on iOS — the touch gesture had to guess which one to
+// scroll.
+.topup-modal {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 88vh;
+  overflow: hidden;
+}
+
+.topup-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 12px;
+  flex: none;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--ecom-text-muted);
+  }
+}
+
+.topup-modal__close {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+  }
+}
+
+.topup-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 24px 18px;
+  overflow-y: auto;
+  // Setting only overflow-y implicitly computes overflow-x to auto too (CSS spec behavior), which
+  // opened the door to a horizontal scrollbar appearing here on its own whenever anything inside ran
+  // even slightly wide — explicit hidden closes that off entirely, on any device.
+  overflow-x: hidden;
+  min-height: 0;
+  // Claims the space left over after the fixed header/footer, which is what actually makes its own
+  // overflow-y:auto trigger — see .topup-modal's doc comment above.
+  flex: 1;
+}
+
+// Amount + Note side by side on desktop/tablet — collapses to a single column once the row can no
+// longer fit two comfortably-sized fields (see the mobile breakpoint below).
+.topup-modal__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.error-banner {
+  margin: 0;
+}
+
+.topup-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.topup-modal__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ecom-text-muted);
+}
+
+.topup-modal__optional {
+  font-weight: 400;
+  color: var(--ecom-text-muted);
+}
+
+// Same dark-blue filled toggle-group as the admin Sellers/KYC Review/Top-Up/Withdrawal status
+// filters — reused verbatim rather than a new button style, per request.
+.topup-modal__method-toggle {
+  margin-bottom: 4px;
+  // .topup-modal__field is a column flex container with no align-items set, which defaults to
+  // stretch — without this, the toggle-group (and its dark-blue background) stretched to the full
+  // width of the field instead of wrapping just the Bank/E Vault buttons.
+  align-self: flex-start;
+
+  @include status-tabs.dark-blue-toggle-group;
+}
+
+// ---------- Bank account selector (Admin Profile → Bank Accounts, read-only here) ----------
+
+.bank-selector {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  // Horizontal scroll on narrow widths only clips within this row, never the page — satisfies
+  // "no page-level horizontal overflow" while still letting 4+ accounts stay reachable on mobile.
+  scrollbar-width: thin;
+}
+
+.bank-selector__tab {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 132px;
+  padding: 7px 10px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 10px;
+  background: var(--ecom-surface-alt);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+
+  &:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+  }
+
+  &--active {
+    border: 1.5px solid var(--ecom-indigo);
+    background: rgba(99, 102, 241, 0.12);
+  }
+}
+
+.bank-selector__icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ecom-indigo-dim);
+  color: #ffffff;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.bank-selector__tab-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.bank-selector__bank-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ecom-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bank-selector__account-number {
+  font-size: 0.72rem;
+  color: var(--ecom-text-muted);
+}
+
+.bank-selector__badge {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.18);
+  color: var(--ecom-indigo);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+
+  &--outline {
+    background: none;
+    border: 1px solid rgba(99, 102, 241, 0.5);
+  }
+}
+
+.bank-selector__loading {
+  display: flex;
+  justify-content: center;
+  padding: 14px 0;
+}
+
+.bank-selector__spinner {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--ecom-border);
+  border-top-color: var(--ecom-indigo);
+  animation: topup-spin 0.7s linear infinite;
+}
+
+.bank-selector__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 16px;
+  border: 1px dashed var(--ecom-border);
+  border-radius: 12px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+    color: var(--ecom-text-muted);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ecom-text);
+  }
+
+  span {
+    font-size: 0.8rem;
+    color: var(--ecom-text-muted);
+  }
+}
+
+.bank-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 12px;
+  background: var(--ecom-surface-alt);
+}
+
+.bank-detail__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.bank-detail__bank-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+
+  mat-icon {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+    color: var(--ecom-indigo);
+  }
+}
+
+// Account Holder / Account Number side by side, IBAN spanning the full row beneath — trades the
+// previous 4-row vertical stack for 2 rows so a selected account never dominates modal height.
+.bank-detail__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+}
+
+.bank-detail__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+}
+
+.bank-detail__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ecom-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.bank-detail__value {
+  font-size: 0.85rem;
+  color: var(--ecom-text);
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.bank-detail__value-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bank-detail__copy-btn {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--ecom-border);
+  border-radius: 7px;
+  background: var(--ecom-surface);
+  color: var(--ecom-indigo);
+  cursor: pointer;
+  box-sizing: border-box;
+
+  // Buttons pick up the UA stylesheet's default padding unless reset — that was eating into this
+  // box and squeezing the icon down to a sliver instead of the full glyph.
+  mat-icon {
+    flex: none;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+  }
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+.topup-modal__amount {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 10px;
+  background: var(--ecom-surface-alt);
+
+  &:focus-within {
+    border-color: var(--ecom-indigo);
+  }
+}
+
+.topup-modal__currency {
+  color: var(--ecom-text-muted);
+  font-size: 0.95rem;
+}
+
+.topup-modal__amount input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.95rem;
+  color: var(--ecom-text);
+  font-family: inherit;
+
+  &::placeholder {
+    color: var(--ecom-text-muted);
+  }
+
+  // Hide the native up/down spinners so it reads as a currency field, not a generic number stepper.
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  appearance: textfield;
+}
+
+// A plain single-line input, not a <textarea> — this field is a one-line reference value (its own
+// placeholder says so), and a <textarea>'s top-aligned text plus resize handle made it render taller/
+// less consistent than the same height:44px on Amount's box depending on the browser/device, which is
+// exactly the "not equal height" mismatch this fixes. A native input matches Amount's box pixel-for-
+// pixel with no extra sizing math needed.
+.topup-modal__field input[type='text'] {
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 10px;
+  background: var(--ecom-surface-alt);
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: var(--ecom-text);
+
+  &:focus {
+    outline: none;
+    border-color: var(--ecom-indigo);
+  }
+
+  &::placeholder {
+    color: var(--ecom-text-muted);
+  }
+}
+
+.topup-modal__footer {
+  flex: none;
+  display: flex;
+  gap: 12px;
+  padding: 4px 24px 22px;
+}
+
+.topup-modal__cancel {
+  flex: 1;
+  height: 44px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ecom-text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+.topup-modal__submit {
+  flex: 1.4;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 10px;
+  background: #0f1f3d;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: #16264a;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.topup-modal__spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  animation: topup-spin 0.7s linear infinite;
+}
+
+@keyframes topup-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.topup-modal__confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 28px 32px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: #22c55e;
+  }
+
+  p {
+    margin: 0 0 8px;
+    font-size: 0.92rem;
+    color: var(--ecom-text-muted);
+  }
+
+  .topup-modal__submit {
+    flex: none;
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+// Below this width the two-column rows no longer have room to breathe — stack them instead of letting
+// cells crush down to an unreadable width (which was also what caused a horizontal scrollbar to creep
+// into the modal on some devices). 480px — the app's own standard phone breakpoint — rather than the
+// previous 420px: several common iPhone widths (390-430px, e.g. 14/15/16 Plus and Pro Max) sit above
+// 420px, so those specifically kept the cramped two-column layout while narrower Android phones
+// already stacked correctly — this closes that gap so every phone, iOS or Android, stacks the same
+// way. The dialog itself already goes near-full-width here via the clamp() passed to MatDialogConfig
+// at the open() call site.
+//
+// Also the width where Amount/Note switch to 16px — the minimum that keeps iOS Safari from
+// auto-zooming the whole page in when one of them is focused.
+@media (max-width: 480px) {
+  .topup-modal__row,
+  .bank-detail__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bank-detail__cell--full {
+    grid-column: 1;
+  }
+
+  .topup-modal__amount input,
+  .topup-modal__field input[type='text'] {
+    font-size: 16px;
+  }
+}

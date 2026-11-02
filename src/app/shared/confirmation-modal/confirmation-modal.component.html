@@ -1,0 +1,47 @@
+<div class="confirm-modal" [class.confirm-modal--red]="data.variant === 'red'" [class.confirm-modal--green]="data.variant === 'green'">
+  <header class="confirm-modal__header">
+    <span class="confirm-modal__icon">
+      <mat-icon>{{ data.icon ?? 'warning' }}</mat-icon>
+    </span>
+    <div>
+      <h2>{{ data.title }}</h2>
+      <p>{{ data.message }}</p>
+    </div>
+  </header>
+
+  <div class="confirm-modal__body">
+    @if (data.requireReason || data.showReason) {
+      <label class="confirm-modal__field">
+        <span>{{ data.reasonLabel ?? 'Reason' }}</span>
+        <textarea rows="3" [ngModel]="reason()" (ngModelChange)="reason.set($event)" placeholder="Explain why this action is being taken…"></textarea>
+      </label>
+    }
+
+    @if (data.typeToConfirmValue) {
+      <label class="confirm-modal__field">
+        <span>Type <strong>{{ data.typeToConfirmValue }}</strong> to confirm</span>
+        <input type="text" [ngModel]="typedConfirmation()" (ngModelChange)="typedConfirmation.set($event)" [placeholder]="data.typeToConfirmValue" />
+      </label>
+    }
+
+    @if (data.showFileUpload) {
+      <div class="confirm-modal__field">
+        <span>{{ data.fileUploadLabel ?? 'Attach file (optional)' }}</span>
+        <app-file-upload
+          theme="light"
+          [multiple]="false"
+          accept="image/*,.pdf"
+          hint="Any image or PDF, up to 10 MB"
+          [files]="file() ? [file()!] : []"
+          (filesSelected)="onFileSelected($event)"
+          (fileRemoved)="onFileRemoved()"
+        ></app-file-upload>
+      </div>
+    }
+  </div>
+
+  <footer class="confirm-modal__footer">
+    <button type="button" class="confirm-modal__btn confirm-modal__btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="confirm-modal__btn confirm-modal__btn--solid" [disabled]="!canConfirm()" (click)="confirm()">{{ data.confirmLabel }}</button>
+  </footer>
+</div>

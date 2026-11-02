@@ -1,0 +1,239 @@
+<div class="order-picker">
+  <header class="order-picker__header">
+    <div class="order-picker__heading">
+      @if (step() === 'products' || step() === 'address') {
+        <button
+          type="button"
+          class="order-picker__back"
+          (click)="step() === 'products' ? backToSellers() : backToProducts()"
+          aria-label="Back"
+        >
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      }
+      <div>
+        @switch (step()) {
+          @case ('sellers') {
+            <h2>Create Order</h2>
+            <p>Select a seller to create orders for.</p>
+          }
+          @case ('products') {
+            <h2>{{ selectedSeller()?.storeName }}</h2>
+            <p>Select one or more of this seller's own products.</p>
+          }
+          @case ('address') {
+            <h2>Delivery details</h2>
+            <p>{{ selectedCount() }} product{{ selectedCount() === 1 ? '' : 's' }} for {{ selectedSeller()?.storeName }}</p>
+          }
+          @case ('result') {
+            <h2>Orders created</h2>
+            <p>{{ selectedSeller()?.storeName }}</p>
+          }
+        }
+      </div>
+    </div>
+    <button type="button" class="order-picker__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  @switch (step()) {
+    @case ('sellers') {
+      <div class="order-picker__search">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search sellers by name, store or email..." [value]="sellersSearch()" (input)="onSellerSearchInput($any($event.target).value)" />
+      </div>
+
+      <div class="order-picker__body">
+        @if (sellersError()) {
+          <div class="order-picker__error">
+            <mat-icon>error</mat-icon>
+            <span>{{ sellersError() }}</span>
+          </div>
+        }
+
+        @if (sellersLoading()) {
+          <div class="order-picker__state">
+            <mat-icon>hourglass_empty</mat-icon>
+            <p>Loading sellers…</p>
+          </div>
+        } @else if (sellers().length === 0) {
+          <div class="order-picker__state">
+            <mat-icon>search_off</mat-icon>
+            <p>No sellers match your search.</p>
+          </div>
+        } @else {
+          <div class="seller-picker__list">
+            @for (seller of sellers(); track seller.id) {
+              <button type="button" class="seller-picker__row" (click)="selectSeller(seller)">
+                <div class="seller-picker__info">
+                  <span class="seller-picker__name">{{ seller.name }}</span>
+                  <span class="seller-picker__meta">{{ seller.storeName }} &middot; {{ seller.email }}</span>
+                </div>
+                <mat-icon class="seller-picker__chevron">chevron_right</mat-icon>
+              </button>
+            }
+          </div>
+
+          <app-pager [page]="sellersPage()" [totalPages]="sellersTotalPages()" [totalCount]="sellersTotalCount()" (pageChange)="onSellersPageChange($event)"></app-pager>
+        }
+      </div>
+    }
+
+    @case ('products') {
+      <div class="order-picker__search">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search this seller's products..." [value]="productSearch()" (input)="onProductSearchInput($any($event.target).value)" />
+      </div>
+
+      @if (!productsLoading() && filteredProducts().length > 0) {
+        <label class="order-picker__select-all">
+          <input type="checkbox" [checked]="allFilteredSelected()" (change)="toggleSelectAll()" />
+          <span>Select all</span>
+        </label>
+      }
+
+      <div class="order-picker__body">
+        @if (productsError()) {
+          <div class="order-picker__error">
+            <mat-icon>error</mat-icon>
+            <span>{{ productsError() }}</span>
+          </div>
+        }
+
+        @if (productsLoading()) {
+          <div class="order-picker__state">
+            <mat-icon>hourglass_empty</mat-icon>
+            <p>Loading products…</p>
+          </div>
+        } @else if (filteredProducts().length === 0) {
+          <div class="order-picker__state">
+            <mat-icon>inventory_2</mat-icon>
+            <p>{{ products().length === 0 ? "This seller hasn't added any products to their shop yet." : 'No products match your search.' }}</p>
+          </div>
+        } @else {
+          <div class="order-picker__grid">
+            @for (item of filteredProducts(); track item.id) {
+              <label class="order-picker__card" [class.order-picker__card--selected]="isSelected(item)">
+                <input type="checkbox" class="order-picker__checkbox" [checked]="isSelected(item)" (change)="toggleProduct(item)" (click)="$event.stopPropagation()" />
+
+                @if (item.imageUrl) {
+                  <img class="order-picker__thumb" [src]="fileUrl(item.imageUrl)" [alt]="item.name" (click)="openImage($event, item)" />
+                } @else {
+                  <div class="order-picker__thumb order-picker__thumb--placeholder">
+                    <mat-icon>image</mat-icon>
+                  </div>
+                }
+
+                <h3 class="order-picker__title">{{ item.name }}</h3>
+
+                <div class="order-picker__prices">
+                  <span class="order-picker__price">{{ formatCurrency(item.sell) }}</span>
+                  <span class="order-picker__commission">
+                    <mat-icon>arrow_upward</mat-icon>
+                    {{ formatCurrency(item.profit) }}
+                  </span>
+                </div>
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="order-picker__summary-bar">
+        <div class="order-picker__summary-stats">
+          <span class="order-picker__summary-count">{{ selectedCount() }} product{{ selectedCount() === 1 ? '' : 's' }} selected</span>
+          @if (selectedCount() > 0) {
+            <span class="order-picker__summary-detail">{{ formatCurrency(selectedTotalAmount()) }} total &middot; {{ formatCurrency(selectedTotalProfit()) }} profit</span>
+          }
+        </div>
+        <button type="button" class="order-picker__action" [disabled]="selectedCount() === 0" (click)="proceedToAddress()">Next</button>
+      </div>
+    }
+
+    @case ('address') {
+      <form class="order-picker__body order-address-form" [formGroup]="addressForm" (ngSubmit)="submit()">
+        @if (submitError()) {
+          <div class="order-picker__error">
+            <mat-icon>error</mat-icon>
+            <span>{{ submitError() }}</span>
+          </div>
+        }
+
+        <label class="order-address-form__field">
+          <span>Customer name</span>
+          <input type="text" formControlName="customerName" />
+          @if (addressForm.controls.customerName.invalid && addressForm.controls.customerName.touched) {
+            <span class="order-address-form__error">Customer name is required</span>
+          }
+        </label>
+
+        <label class="order-address-form__field">
+          <span>Address line 1</span>
+          <input type="text" formControlName="addressLine1" />
+          @if (addressForm.controls.addressLine1.invalid && addressForm.controls.addressLine1.touched) {
+            <span class="order-address-form__error">Address line 1 is required</span>
+          }
+        </label>
+
+        <label class="order-address-form__field">
+          <span>Address line 2 <span class="order-address-form__optional">(optional)</span></span>
+          <input type="text" formControlName="addressLine2" />
+        </label>
+
+        <div class="order-address-form__row">
+          <label class="order-address-form__field">
+            <span>City</span>
+            <input type="text" formControlName="city" />
+            @if (addressForm.controls.city.invalid && addressForm.controls.city.touched) {
+              <span class="order-address-form__error">City is required</span>
+            }
+          </label>
+
+          <label class="order-address-form__field">
+            <span>Zip code</span>
+            <input type="text" formControlName="zipCode" />
+            @if (addressForm.controls.zipCode.invalid && addressForm.controls.zipCode.touched) {
+              <span class="order-address-form__error">Zip code is required</span>
+            }
+          </label>
+        </div>
+
+        <label class="order-address-form__field">
+          <span>Phone</span>
+          <input type="text" formControlName="phone" />
+          @if (addressForm.controls.phone.invalid && addressForm.controls.phone.touched) {
+            <span class="order-address-form__error">Phone number is required</span>
+          }
+        </label>
+
+        <button type="submit" class="order-picker__action order-address-form__submit" [disabled]="submitting()">
+          {{ submitting() ? 'Creating…' : 'Create ' + selectedCount() + ' Order' + (selectedCount() === 1 ? '' : 's') }}
+        </button>
+      </form>
+    }
+
+    @case ('result') {
+      <div class="order-picker__body">
+        <div class="order-picker__result">
+          <mat-icon class="order-picker__result-icon" [class.order-picker__result-icon--partial]="failures().length > 0">
+            {{ failures().length === 0 ? 'check_circle' : 'info' }}
+          </mat-icon>
+          <h3>{{ createdCount() }} order{{ createdCount() === 1 ? '' : 's' }} created</h3>
+          @if (failures().length > 0) {
+            <p>{{ failures().length }} product{{ failures().length === 1 ? '' : 's' }} couldn't be turned into an order:</p>
+            <ul class="order-picker__result-failures">
+              @for (failure of failures(); track failure.productId) {
+                <li>{{ failure.reason }}</li>
+              }
+            </ul>
+          } @else {
+            <p>All selected products were created as orders and assigned to {{ selectedSeller()?.storeName }}.</p>
+          }
+        </div>
+
+        <button type="button" class="order-picker__action order-address-form__submit" (click)="close()">Done</button>
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,117 @@
+<div class="withdraw-modal">
+  <header class="withdraw-modal__header">
+    <div>
+      <h2>Withdraw Funds</h2>
+      <p>Available balance: <strong>{{ data.availableBalance | currency }}</strong></p>
+    </div>
+    <button type="button" class="withdraw-modal__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  @if (submitted()) {
+    <div class="withdraw-modal__confirmation">
+      <mat-icon>check_circle</mat-icon>
+      <p>Your withdrawal request has been submitted and is pending Support team review.</p>
+      <button type="button" class="withdraw-modal__submit" (click)="close()">Done</button>
+    </div>
+  } @else {
+    <div class="withdraw-modal__body">
+      @if (creditScoreTooLow()) {
+        <div class="error-banner">
+          <mat-icon>error</mat-icon>
+          <span>Withdrawal unavailable: Your credit score is too low. A minimum credit score of 90 is required to withdraw funds.</span>
+        </div>
+      } @else if (errorMessage()) {
+        <div class="error-banner">
+          <mat-icon>error</mat-icon>
+          <span>{{ errorMessage() }}</span>
+          @if (transactionPasswordNotSet() || bankDetailsNotSet()) {
+            <button type="button" class="error-banner__action" (click)="goToBankDetails()">Set it now</button>
+          }
+        </div>
+      }
+
+      <label class="withdraw-modal__field">
+        <span class="withdraw-modal__label">Withdrawal method</span>
+        <div class="withdraw-modal__method-toggle">
+          <button type="button" [class.withdraw-modal__method-btn--active]="method() === 'BankTransfer'" class="withdraw-modal__method-btn" (click)="method.set('BankTransfer')">
+            <mat-icon>account_balance</mat-icon>
+            Bank Transfer
+          </button>
+          <button type="button" [class.withdraw-modal__method-btn--active]="method() === 'Wallet'" class="withdraw-modal__method-btn" (click)="method.set('Wallet')">
+            <mat-icon>account_balance_wallet</mat-icon>
+            Wallet
+          </button>
+        </div>
+        @if (method() === 'BankTransfer') {
+          <span class="withdraw-modal__hint">Paid to the bank account on file in your Profile's Bank Account Details.</span>
+        }
+      </label>
+
+      @if (method() === 'Wallet') {
+        <label class="withdraw-modal__field">
+          <span class="withdraw-modal__label">Wallet provider</span>
+          <input type="text" placeholder="e.g. PayPal, Wise" [value]="walletProvider()" (input)="walletProvider.set($any($event.target).value)" />
+        </label>
+
+        <label class="withdraw-modal__field">
+          <span class="withdraw-modal__label">Wallet account ID</span>
+          <input type="text" placeholder="Email, username, or account ID" [value]="walletAccountId()" (input)="walletAccountId.set($any($event.target).value)" />
+        </label>
+      }
+
+      <label class="withdraw-modal__field">
+        <span class="withdraw-modal__label">Amount</span>
+        <div class="withdraw-modal__amount">
+          <span class="withdraw-modal__currency">$</span>
+          <input
+            type="number"
+            min="0.01"
+            [max]="data.availableBalance"
+            step="0.01"
+            placeholder="0.00"
+            [value]="amount() ?? ''"
+            (input)="onAmountInput($any($event.target).value)"
+          />
+        </div>
+        @if (amount() !== null && amount()! > data.availableBalance) {
+          <span class="withdraw-modal__hint withdraw-modal__hint--error">You can't request more than your available balance.</span>
+        }
+      </label>
+
+      <label class="withdraw-modal__field">
+        <span class="withdraw-modal__label">Note <span class="withdraw-modal__optional">(optional)</span></span>
+        <textarea rows="2" placeholder="Anything the Support team should know" [value]="note()" (input)="note.set($any($event.target).value)"></textarea>
+      </label>
+
+      <label class="withdraw-modal__field">
+        <span class="withdraw-modal__label">Transaction password</span>
+        <div class="withdraw-modal__amount">
+          <input
+            [type]="hideTransactionPassword() ? 'password' : 'text'"
+            placeholder="Enter your transaction password"
+            autocomplete="current-password"
+            [value]="transactionPassword()"
+            (input)="transactionPassword.set($any($event.target).value)"
+          />
+          <button type="button" class="withdraw-modal__toggle" (click)="hideTransactionPassword.set(!hideTransactionPassword())">
+            <mat-icon>{{ hideTransactionPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </div>
+        <span class="withdraw-modal__hint">Required to authorize this withdrawal.</span>
+      </label>
+    </div>
+
+    <footer class="withdraw-modal__footer">
+      <button type="button" class="withdraw-modal__submit" [disabled]="!isValid() || submitting()" (click)="submit()">
+        @if (submitting()) {
+          <span class="withdraw-modal__spinner"></span>
+          Submitting…
+        } @else {
+          Submit Withdrawal Request
+        }
+      </button>
+    </footer>
+  }
+</div>

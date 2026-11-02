@@ -1,0 +1,705 @@
+@use '../../shared/styles/breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
+// ---------- Page header ----------
+// Matches the icon+title/subtext pattern already established by Products/Orders' own headers —
+// Dashboard had no header of its own before this.
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+}
+
+.dashboard-header__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #7c3aed;
+  color: #ffffff;
+  flex: none;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.dashboard-header__subtext {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--ecom-text-muted);
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 60vh;
+  color: var(--ecom-text-muted);
+  text-align: center;
+}
+
+.state--error mat-icon {
+  color: var(--ecom-red);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--ecom-border);
+  border-top-color: #0f1f3d;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.retry-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--ecom-border);
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+// ---------- Welcome banner ----------
+
+.banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 13px 28px;
+  border-radius: 16px;
+  background: linear-gradient(150deg, #0f1f3d 0%, #16284d 60%, #102142 100%);
+  color: #ffffff;
+}
+
+.banner__left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.banner__avatar-row {
+  margin-bottom: 8px;
+}
+
+.banner__avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.banner__avatar-dot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #0f1f3d;
+}
+
+.banner__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 4px;
+}
+
+.banner__name {
+  margin: 0 0 6px;
+  font-size: 1.55rem;
+  font-weight: 700;
+}
+
+.banner__rating-credit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 8px;
+}
+
+.banner__credit-score {
+  font-weight: 600;
+}
+
+.banner__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 12px;
+}
+
+.banner__rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #ffffff;
+
+  mat-icon {
+    color: #fbbf24;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.banner__dot {
+  opacity: 0.5;
+}
+
+.banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.banner__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.16);
+  }
+}
+
+.banner__right {
+  flex: none;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.banner__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  min-width: 110px;
+}
+
+.banner__stat-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.banner__stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+// ---------- Summary cards ----------
+
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+
+  &--blue {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.18);
+
+    .summary-card__icon {
+      background: rgba(59, 130, 246, 0.16);
+      color: #2563eb;
+    }
+  }
+
+  &--green {
+    background: rgba(34, 197, 94, 0.08);
+    border-color: rgba(34, 197, 94, 0.18);
+
+    .summary-card__icon {
+      background: rgba(34, 197, 94, 0.16);
+      color: #16a34a;
+    }
+  }
+
+  &--purple {
+    background: rgba(168, 85, 247, 0.08);
+    border-color: rgba(168, 85, 247, 0.18);
+
+    .summary-card__icon {
+      background: rgba(168, 85, 247, 0.16);
+      color: #9333ea;
+    }
+  }
+}
+
+.summary-card__icon {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summary-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summary-card__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ecom-text-muted);
+}
+
+.summary-card__value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+// ---------- 6 stat tiles ----------
+
+.tile-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 11px;
+  border-radius: 14px;
+  background: var(--ecom-surface);
+  border: 1px solid var(--ecom-border);
+}
+
+.tile__icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &--blue {
+    background: rgba(59, 130, 246, 0.14);
+    color: #2563eb;
+  }
+
+  &--green {
+    background: rgba(34, 197, 94, 0.14);
+    color: #16a34a;
+  }
+
+  &--orange {
+    background: rgba(245, 158, 11, 0.14);
+    color: #d97706;
+  }
+
+  &--gray {
+    background: rgba(148, 163, 184, 0.16);
+    color: var(--ecom-text-muted);
+  }
+}
+
+.tile__value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.tile__label {
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+}
+
+// ---------- Panels ----------
+
+.panel-row {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.panel {
+  background: var(--ecom-surface);
+  border: 1px solid var(--ecom-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.panel__header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-icon {
+    color: var(--ecom-text-muted);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+}
+
+.panel__badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.panel__muted {
+  font-size: 0.82rem;
+  color: var(--ecom-text-muted);
+}
+
+.panel__rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel__row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--ecom-border);
+  font-size: 0.88rem;
+  color: var(--ecom-text);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.panel__row-green {
+  color: var(--ecom-green);
+  font-weight: 700;
+}
+
+.panel__category-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--ecom-border);
+  font-size: 0.88rem;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.category-row__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ecom-text);
+}
+
+.category-row__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.category-row__right {
+  color: var(--ecom-text-muted);
+}
+
+.panel__empty {
+  margin: 0;
+  padding: 12px 0;
+  color: var(--ecom-text-muted);
+  font-size: 0.85rem;
+}
+
+// ---------- Responsive ----------
+
+@media (max-width: 1200px) {
+  .tile-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .banner {
+    flex-direction: column;
+  }
+
+  // .banner__actions lives inside .banner__left in markup (it belongs there visually on desktop,
+  // directly under the rating row) but the screenshot's mobile order is avatar/name/rating -> balance
+  // -> action buttons, i.e. actions must render AFTER .banner__right once the card stacks. display:
+  // contents unwraps .banner__left so its children become direct flex items of .banner, letting
+  // `order` place .banner__actions after .banner__right without duplicating any markup.
+  .banner__left {
+    display: contents;
+  }
+
+  .banner__avatar-row,
+  .banner__eyebrow,
+  .banner__name,
+  .banner__rating-credit,
+  .banner__meta {
+    order: 1;
+  }
+
+  .banner__right {
+    order: 2;
+    width: 100%;
+  }
+
+  .banner__actions {
+    order: 3;
+  }
+
+  .banner__stat {
+    flex: 1;
+  }
+
+  .panel-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .tile-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// Below this width, the 4 action buttons (Add product/View orders/Withdraw/Top Up) no longer fit
+// their natural size on one line but 3 of them still do — plain flex-wrap left the 4th stranded alone
+// on its own row instead of pairing up evenly. A fixed 2-column grid sidesteps that regardless of
+// exactly how many buttons there are or how wide their labels are.
+@include bp.tablet {
+  .banner__actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .banner__btn {
+    justify-content: center;
+  }
+}
+
+// Phone widths — matches the reference screenshot exactly: 3-column colored stat row stays 3-up
+// (not stacked to 1 column), tighter banner padding, smaller type throughout.
+@include bp.mobile {
+  .dashboard {
+    gap: 14px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .dashboard-header__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+
+    mat-icon {
+      font-size: 17px;
+      width: 17px;
+      height: 17px;
+    }
+  }
+
+  .banner {
+    padding: 18px;
+    border-radius: 18px;
+    gap: 14px;
+  }
+
+  .banner__name {
+    font-size: 1.3rem;
+  }
+
+  .banner__meta {
+    margin-bottom: 10px;
+  }
+
+  .banner__right {
+    gap: 10px;
+  }
+
+  .banner__stat {
+    min-width: 0;
+    padding: 12px 14px;
+  }
+
+  .banner__stat-value {
+    font-size: 1.1rem;
+  }
+
+  .banner__actions {
+    gap: 8px;
+  }
+
+  .banner__btn {
+    padding: 8px 12px;
+    font-size: 0.78rem;
+  }
+
+  .summary-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .summary-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 8px;
+  }
+
+  .summary-card__icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .summary-card__label {
+    font-size: 0.6rem;
+  }
+
+  .summary-card__value {
+    font-size: 0.95rem;
+  }
+
+  .tile-row {
+    gap: 10px;
+  }
+
+  .tile {
+    padding: 10px;
+  }
+
+  .panel-row {
+    gap: 10px;
+  }
+
+}

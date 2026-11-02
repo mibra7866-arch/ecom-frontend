@@ -1,0 +1,17 @@
+// Same pill shape/weight as StatusBadgeComponent, neutral indigo tone since this isn't a status.
+.results-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(99, 102, 241, 0.14);
+  color: var(--ecom-indigo);
+
+  strong {
+    font-weight: 700;
+  }
+}

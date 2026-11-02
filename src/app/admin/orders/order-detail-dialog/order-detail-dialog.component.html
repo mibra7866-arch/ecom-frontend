@@ -1,0 +1,80 @@
+<div class="order-detail-dialog">
+  <header class="order-detail-dialog__header">
+    <h2>Order #{{ order().id }}</h2>
+    <button type="button" class="order-detail-dialog__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="order-detail-dialog__body">
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <div class="order-detail-dialog__top">
+      @if (order().productImageUrl) {
+        <img class="order-detail-dialog__thumb" [src]="fileUrl(order().productImageUrl!)" [alt]="order().productName" (click)="openImage()" />
+      } @else {
+        <div class="order-detail-dialog__thumb order-detail-dialog__thumb--placeholder">
+          <mat-icon>image</mat-icon>
+        </div>
+      }
+
+      <div class="order-detail-dialog__info">
+        <h3>{{ order().productName }}</h3>
+        <span class="order-detail-dialog__meta">&times;{{ order().quantity }} &middot; {{ order().createdAt | date: 'MMM d, y' }}</span>
+      </div>
+
+      <div class="order-detail-dialog__prices">
+        <span class="order-detail-dialog__amount">{{ order().amount | currency }}</span>
+        <span class="order-detail-dialog__profit">
+          <mat-icon>arrow_upward</mat-icon>
+          {{ order().profit | currency }}
+        </span>
+      </div>
+    </div>
+
+    <div class="order-detail-dialog__status-row">
+      <span class="order-status-pill" [class]="statusClass(order().status)">
+        <span class="order-status-pill__dot"></span>
+        {{ statusLabel(order().status) }}
+      </span>
+    </div>
+
+    @if (order().customerName) {
+      <div class="order-detail-dialog__row3">
+        <div class="order-detail-dialog__cell">
+          <span class="order-detail-dialog__cell-label">Customer</span>
+          <span class="order-detail-dialog__cell-value">{{ order().customerName }}</span>
+        </div>
+        <div class="order-detail-dialog__cell">
+          <span class="order-detail-dialog__cell-label">Phone</span>
+          <span class="order-detail-dialog__cell-value">{{ order().phone ?? '—' }}</span>
+        </div>
+        <div class="order-detail-dialog__cell">
+          <span class="order-detail-dialog__cell-label">Shipping Address</span>
+          <span class="order-detail-dialog__cell-value">{{ shippingAddress(order()) }}</span>
+        </div>
+      </div>
+    }
+
+    <label class="order-detail-dialog__field">
+      <span>Order status</span>
+      <select [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+        @for (status of availableStatuses; track status) {
+          <option [value]="status">{{ statusLabel(status) }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  <footer class="order-detail-dialog__footer">
+    <button type="button" class="order-detail-dialog__btn order-detail-dialog__btn--secondary" (click)="close()">Cancel</button>
+    <button type="button" class="order-detail-dialog__btn order-detail-dialog__btn--primary" [disabled]="!hasChange || saving()" (click)="save()">
+      {{ saving() ? 'Saving…' : 'Save' }}
+    </button>
+  </footer>
+</div>

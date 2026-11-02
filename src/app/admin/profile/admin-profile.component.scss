@@ -1,0 +1,364 @@
+// Root layout (.list-page, .scroll-fixed, .scroll-area, .list-page__header, .error-banner) comes
+// from the shared global utility classes in src/styles.scss — same pattern every other admin module
+// uses, so this page scrolls internally instead of the whole shell content pane. Only the content
+// INSIDE .scroll-area below is redesigned to match the Seller Profile page's layout.
+
+.admin-profile__scroll {
+  padding-bottom: 4px;
+}
+
+.admin-profile__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+// ---------- Header banner ----------
+// Same dark-navy gradient + left-aligned avatar/info row as Seller Profile's own header — see
+// seller-home.component.scss's .seller-home__banner, adapted to an admin's own fields (role/LLC
+// codes created instead of verified/rating/credit score).
+
+.admin-profile__banner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: 20px;
+  padding: 28px 28px 24px;
+  border-radius: var(--ecom-radius);
+  background: linear-gradient(150deg, #0f1f3d 0%, #16284d 60%, #102142 100%);
+  color: #ffffff;
+}
+
+.admin-profile__avatar-wrap {
+  flex: none;
+}
+
+.admin-profile__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.admin-profile__banner-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.admin-profile__name {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.admin-profile__owner {
+  margin: 2px 0 0;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.65);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.admin-profile__pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.admin-profile__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-profile__member-since {
+  margin: 12px 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-profile__loading {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+// ---------- Settings menu ----------
+// Same icon-circle + title/subtitle + chevron row as Seller Profile's settings menu.
+
+.admin-profile__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-profile__menu-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: var(--ecom-radius);
+  background: var(--ecom-surface);
+  box-shadow: var(--ecom-shadow);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+.admin-profile__menu-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &--indigo {
+    background: rgba(99, 102, 241, 0.14);
+    color: var(--ecom-indigo);
+  }
+}
+
+.admin-profile__menu-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-profile__menu-title {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.admin-profile__menu-subtitle {
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-profile__menu-chevron {
+  flex: none;
+  color: var(--ecom-text-muted);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+// ---------- Cards (Bank Accounts / E Vault / Change Password / Transaction Password) ----------
+// Same card surface as Seller Profile's KYC card — border + radius + shadow + 24px padding.
+
+.admin-profile__card {
+  display: flex;
+  flex-direction: column;
+  background: var(--ecom-surface);
+  border: 1px solid var(--ecom-border);
+  border-radius: var(--ecom-radius);
+  box-shadow: var(--ecom-shadow);
+  padding: 24px;
+  min-width: 0;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+    color: var(--ecom-text);
+  }
+}
+
+.admin-profile__card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  h2 {
+    margin: 0;
+  }
+
+  button {
+    flex: none;
+  }
+}
+
+.admin-profile__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ecom-text-muted);
+}
+
+// ---------- Bank accounts ----------
+
+.admin-profile__accounts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-profile__account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 12px;
+  background: var(--ecom-surface-alt);
+
+  &--default {
+    border-color: rgba(99, 102, 241, 0.5);
+  }
+}
+
+.admin-profile__account-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-profile__account-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-profile__account-bank {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ecom-text);
+}
+
+.admin-profile__default-badge {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.16);
+  color: var(--ecom-indigo);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.admin-profile__account-sub {
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.admin-profile__account-actions {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
+
+.admin-profile__account-btn {
+  padding: 6px 10px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 8px;
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+// ---------- Change password / transaction password forms ----------
+
+.admin-profile__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+
+  button[type='submit'] {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+}
+
+.admin-profile__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--ecom-text-muted);
+
+  input {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--ecom-border);
+    border-radius: 8px;
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+    font-size: 0.88rem;
+    font-family: inherit;
+    outline: none;
+
+    &:focus {
+      border-color: var(--ecom-indigo);
+    }
+  }
+}
+
+// ---------- Responsive ----------
+
+@media (max-width: 480px) {
+  .admin-profile__banner {
+    padding: 24px 16px 20px;
+  }
+
+  .admin-profile__avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+
+  .admin-profile__menu-row {
+    padding: 12px 14px;
+  }
+
+  .admin-profile__card {
+    padding: 18px;
+  }
+}

@@ -1,0 +1,146 @@
+<div class="order-detail">
+  <button type="button" class="order-detail__back" (click)="back()">
+    <mat-icon>arrow_back</mat-icon>
+    Back to Orders
+  </button>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+      @if (insufficientBalance()) {
+        <button type="button" class="error-banner__action" (click)="goToTopUp()">Top Up</button>
+      }
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="order-detail__loading">
+      <mat-spinner diameter="28"></mat-spinner>
+    </div>
+  } @else if (order(); as o) {
+    <div class="order-detail__card">
+      <header class="order-detail__top">
+        @if (o.productImageUrl) {
+          <img class="order-detail__thumb" [src]="fileUrl(o.productImageUrl)" [alt]="o.productName" (click)="openImage()" />
+        } @else {
+          <div class="order-detail__thumb order-detail__thumb--placeholder">
+            <mat-icon>image</mat-icon>
+          </div>
+        }
+
+        <div class="order-detail__info">
+          <h1>{{ o.productName }}</h1>
+          <div class="order-detail__meta">
+            <span class="order-detail__date">
+              <mat-icon>calendar_today</mat-icon>
+              {{ o.createdAt | date: 'MMM d' }}
+            </span>
+            <span class="order-detail__qty">&times;{{ o.quantity }}</span>
+          </div>
+        </div>
+
+        <div class="order-detail__prices">
+          <span class="order-detail__amount">{{ o.amount | currency }}</span>
+          <span class="order-detail__profit">
+            <mat-icon>arrow_upward</mat-icon>
+            {{ o.profit | currency }}
+          </span>
+        </div>
+      </header>
+
+      <div class="order-detail__status-row">
+        <span class="order-status-pill" [class]="statusClass(o)">
+          <span class="order-status-pill__dot"></span>
+          {{ statusLabel(o) }}
+        </span>
+      </div>
+
+      @if (o.maskedCustomerName) {
+        <div class="order-detail__row3">
+          <div class="order-detail__cell">
+            <span class="order-detail__cell-label">Customer</span>
+            <span class="order-detail__cell-value">{{ o.maskedCustomerName }}</span>
+          </div>
+          <div class="order-detail__cell">
+            <span class="order-detail__cell-label">Phone</span>
+            <span class="order-detail__cell-value">{{ o.maskedPhone ?? '—' }}</span>
+          </div>
+          <div class="order-detail__cell">
+            <span class="order-detail__cell-label">Shipping Address</span>
+            <span class="order-detail__cell-value">{{ shippingAddress(o) }}</span>
+          </div>
+        </div>
+      }
+
+      <div class="order-detail__row3">
+        <div class="order-detail__cell">
+          <span class="order-detail__cell-label">Cost</span>
+          <span class="order-detail__cell-value">{{ o.amount | currency }}</span>
+        </div>
+        <div class="order-detail__cell">
+          <span class="order-detail__cell-label">Profit</span>
+          <span class="order-detail__cell-value order-detail__cell-value--green">{{ o.profit | currency }}</span>
+        </div>
+        <div class="order-detail__cell">
+          <span class="order-detail__cell-label">Order</span>
+          <span class="order-detail__cell-value">#{{ o.id }}</span>
+        </div>
+      </div>
+
+      @if (o.status !== 'Cancelled') {
+        <ol class="order-detail__stepper">
+          @for (step of stepperSteps; track step; let i = $index) {
+            <li class="order-detail__step" [class.order-detail__step--done]="i < stepperReached(o)">
+              <span class="order-detail__step-circle">{{ i + 1 }}</span>
+              <span class="order-detail__step-label">{{ step }}</span>
+            </li>
+          }
+        </ol>
+      } @else {
+        <div class="order-detail__cancelled">
+          <mat-icon>cancel</mat-icon>
+          <span>This order was cancelled before it was ever paid for.</span>
+        </div>
+      }
+
+      @if (o.status === 'Assigned') {
+        <div class="order-detail__action">
+          <button type="button" class="order-detail__btn order-detail__btn--accept" [disabled]="accepting()" (click)="accept()">
+            {{ accepting() ? 'Processing…' : 'Pay ' + (o.amount | currency) + ' to process' }}
+          </button>
+        </div>
+      } @else if (o.status === 'Accepted') {
+        <div class="order-detail__note">
+          <mat-icon>local_shipping</mat-icon>
+          <span>Payment received — this order is now processing.</span>
+        </div>
+      } @else if (o.status === 'Completed') {
+        <div class="order-detail__note">
+          <mat-icon>inventory_2</mat-icon>
+          <span>This order is ready — our Support team will mark it on the way once it ships.</span>
+        </div>
+      } @else if (o.status === 'OnTheWay') {
+        <div class="order-detail__note">
+          <mat-icon>local_shipping</mat-icon>
+          <span>This order is on the way.</span>
+        </div>
+      } @else if (o.status === 'OutForDelivery') {
+        <div class="order-detail__note">
+          <mat-icon>local_shipping</mat-icon>
+          <span>This order is out for delivery.</span>
+        </div>
+      } @else if (o.status === 'Delivered') {
+        <div class="order-detail__done">
+          <mat-icon>check_circle</mat-icon>
+          <span>This order has been delivered.</span>
+        </div>
+      } @else if (o.status === 'Cancelled') {
+        <div class="order-detail__note order-detail__note--muted">
+          <mat-icon>cancel</mat-icon>
+          <span>This order was cancelled.</span>
+        </div>
+      }
+    </div>
+  }
+</div>

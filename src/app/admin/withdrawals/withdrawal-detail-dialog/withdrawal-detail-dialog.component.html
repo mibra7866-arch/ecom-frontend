@@ -1,0 +1,80 @@
+<div class="withdrawal-detail">
+  <header class="withdrawal-detail__header">
+    <div>
+      <h2>Withdrawal Request</h2>
+      <app-status-badge [status]="withdrawal().status"></app-status-badge>
+    </div>
+    <button type="button" class="withdrawal-detail__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="withdrawal-detail__body">
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <div class="withdrawal-detail__row">
+      <span class="withdrawal-detail__label">Seller</span>
+      <span class="withdrawal-detail__value">{{ withdrawal().sellerName }}</span>
+    </div>
+
+    <div class="withdrawal-detail__row">
+      <span class="withdrawal-detail__label">Amount</span>
+      <span class="withdrawal-detail__value withdrawal-detail__amount">{{ withdrawal().amount | currency }}</span>
+    </div>
+
+    <div class="withdrawal-detail__row">
+      <span class="withdrawal-detail__label">Requested</span>
+      <span class="withdrawal-detail__value">{{ withdrawal().requestedAt | date: 'medium' }}</span>
+    </div>
+
+    @if (withdrawal().note) {
+      <div class="withdrawal-detail__row">
+        <span class="withdrawal-detail__label">Seller note</span>
+        <span class="withdrawal-detail__value">{{ withdrawal().note }}</span>
+      </div>
+    }
+
+    <div class="withdrawal-detail__receipt">
+      <span class="withdrawal-detail__label">Proof / receipt</span>
+      @if (isImage) {
+        <button type="button" class="withdrawal-detail__receipt-image-btn" (click)="openReceiptImage()">
+          <img [src]="receiptUrl" alt="Payout proof" class="withdrawal-detail__receipt-image" />
+        </button>
+      } @else if (isPdf) {
+        <iframe [src]="safeReceiptUrl" class="withdrawal-detail__receipt-pdf" title="Payout proof"></iframe>
+      } @else if (hasReceipt) {
+        <a class="withdrawal-detail__receipt-link" [href]="receiptUrl" target="_blank" rel="noopener">
+          <mat-icon>description</mat-icon>
+          Open receipt
+        </a>
+      } @else {
+        <span class="withdrawal-detail__no-receipt">No receipt attached</span>
+      }
+    </div>
+
+    @if (withdrawal().reviewComment) {
+      <div class="withdrawal-detail__row">
+        <span class="withdrawal-detail__label">Admin comment</span>
+        <span class="withdrawal-detail__value">{{ withdrawal().reviewComment }}</span>
+      </div>
+    }
+
+    @if (withdrawal().reviewedAtUtc) {
+      <div class="withdrawal-detail__row">
+        <span class="withdrawal-detail__label">Reviewed</span>
+        <span class="withdrawal-detail__value">{{ withdrawal().reviewedAtUtc | date: 'medium' }}</span>
+      </div>
+    }
+  </div>
+
+  <footer class="withdrawal-detail__footer">
+    <button type="button" class="withdrawal-detail__btn withdrawal-detail__btn--ghost" [disabled]="submitting()" (click)="setPending()">Set to Pending</button>
+    <button type="button" class="withdrawal-detail__btn withdrawal-detail__btn--outline-red" [disabled]="submitting()" (click)="decline()">Decline</button>
+    <button type="button" class="withdrawal-detail__btn withdrawal-detail__btn--green" [disabled]="submitting()" (click)="accept()">Accept</button>
+  </footer>
+</div>

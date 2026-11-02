@@ -1,0 +1,71 @@
+<div class="chat-bubble-row" [class.chat-bubble-row--mine]="mine">
+  <div class="chat-bubble">
+    @if (mine && actionable && !isEditing()) {
+      <button type="button" class="chat-bubble__menu-trigger" [matMenuTriggerFor]="bubbleMenu" aria-label="Message actions">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #bubbleMenu="matMenu">
+        @if (content) {
+          <button mat-menu-item (click)="startEdit()">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+        }
+        <button mat-menu-item (click)="requestDelete()">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </mat-menu>
+    }
+
+    @if (attachmentUrl) {
+      @if (isImageAttachment(attachmentUrl)) {
+        <button type="button" class="chat-bubble__attachment chat-bubble__attachment--image" (click)="openAttachment(attachmentUrl)">
+          <img [src]="fileUrl(attachmentUrl)" alt="Attached image" />
+        </button>
+      } @else {
+        <a class="chat-bubble__attachment" [href]="fileUrl(attachmentUrl)" target="_blank" rel="noopener">
+          <span class="chat-bubble__file">
+            <mat-icon>description</mat-icon>
+            <span>{{ attachmentFileName(attachmentUrl) }}</span>
+          </span>
+        </a>
+      }
+    }
+
+    @if (isEditing()) {
+      <div class="chat-bubble__edit">
+        <textarea class="chat-bubble__edit-input" rows="2" [value]="draft()" (input)="draft.set($any($event.target).value)"></textarea>
+        <div class="chat-bubble__edit-actions">
+          <button type="button" class="chat-bubble__edit-btn" (click)="cancelEdit()">Cancel</button>
+          <button type="button" class="chat-bubble__edit-btn chat-bubble__edit-btn--primary" (click)="confirmEdit()">Save</button>
+        </div>
+      </div>
+    } @else if (content) {
+      <p class="chat-bubble__text">{{ content }}</p>
+    }
+
+    <div class="chat-bubble__meta">
+      @if (editedAtUtc) {
+        <span class="chat-bubble__edited">edited</span>
+      }
+      <span>{{ formatTime(sentAtUtc) }}</span>
+      @if (mine && tickState) {
+        @switch (tickState) {
+          @case ('sending') {
+            <mat-icon class="chat-bubble__tick chat-bubble__tick--pending">schedule</mat-icon>
+          }
+          @case ('sent') {
+            <mat-icon class="chat-bubble__tick">done</mat-icon>
+          }
+          @case ('delivered') {
+            <mat-icon class="chat-bubble__tick">done_all</mat-icon>
+          }
+          @case ('read') {
+            <mat-icon class="chat-bubble__tick chat-bubble__tick--read">done_all</mat-icon>
+          }
+        }
+      }
+    </div>
+  </div>
+</div>

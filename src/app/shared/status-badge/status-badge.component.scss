@@ -1,0 +1,30 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(148, 163, 184, 0.14);
+  color: var(--ecom-text-muted);
+
+  &--green {
+    background: rgba(34, 197, 94, 0.14);
+    color: var(--ecom-green);
+  }
+
+  &--amber {
+    background: rgba(245, 158, 11, 0.14);
+    color: var(--ecom-amber);
+  }
+
+  &--blue {
+    background: rgba(99, 102, 241, 0.14);
+    color: var(--ecom-indigo);
+  }
+
+  &--red {
+    background: rgba(239, 68, 68, 0.14);
+    color: var(--ecom-red);
+  }
+}

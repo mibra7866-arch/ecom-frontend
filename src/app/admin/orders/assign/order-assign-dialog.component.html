@@ -1,0 +1,50 @@
+<div class="assign-dialog">
+  <header class="assign-dialog__header">
+    <div>
+      <h2>Assign Order</h2>
+      <p>Order #{{ data.order.id }} — {{ data.order.productName }}</p>
+    </div>
+    <button type="button" class="assign-dialog__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="assign-dialog__body">
+    @if (errorMessage()) {
+      <div class="assign-dialog__error">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <div class="assign-dialog__search">
+      <mat-icon>search</mat-icon>
+      <input type="text" placeholder="Search sellers by name, email, or store..." [value]="query()" (input)="onSearchInput($any($event.target).value)" />
+    </div>
+
+    @if (searching()) {
+      <div class="assign-dialog__state">
+        <mat-spinner diameter="22"></mat-spinner>
+      </div>
+    } @else if (query().trim() && results().length === 0) {
+      <p class="assign-dialog__empty">No sellers match "{{ query() }}".</p>
+    } @else {
+      <ul class="assign-dialog__results">
+        @for (seller of results(); track seller.sellerId) {
+          <li
+            class="assign-dialog__result"
+            [class.assign-dialog__result--disabled]="assigning() || seller.status !== 'Active'"
+            [title]="seller.status !== 'Active' ? 'Only active sellers can be assigned orders' : ''"
+            (click)="pick(seller)"
+          >
+            <span class="assign-dialog__avatar">{{ seller.name.charAt(0).toUpperCase() }}</span>
+            <span class="assign-dialog__result-text">
+              <span class="assign-dialog__result-name">{{ seller.name }}</span>
+              <span class="assign-dialog__result-store">{{ seller.storeName }} · Balance: {{ formatCurrency(seller.balance) }}</span>
+            </span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>

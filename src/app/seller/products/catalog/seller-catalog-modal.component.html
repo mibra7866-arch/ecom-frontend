@@ -1,0 +1,91 @@
+<div class="catalog-modal">
+  <header class="catalog-modal__header">
+    <div>
+      <h2>Catalog</h2>
+      <p>Browse the master catalog and add products to your shop.</p>
+    </div>
+    <button type="button" class="catalog-modal__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="catalog-modal__filters">
+    <div class="catalog-modal__search">
+      <mat-icon>search</mat-icon>
+      <input type="text" placeholder="Search products by name..." [value]="search()" (input)="onSearchInput($any($event.target).value)" />
+    </div>
+
+    <mat-select class="catalog-modal__category" [value]="category() ?? ''" (selectionChange)="onCategoryChange($event.value)" placeholder="All categories">
+      <mat-option value="">All categories</mat-option>
+      @for (cat of categories(); track cat) {
+        <mat-option [value]="cat">{{ cat }}</mat-option>
+      }
+    </mat-select>
+  </div>
+
+  <div class="catalog-modal__slots-row">
+    @if (limit(); as l) {
+      <span class="catalog-modal__slots">Products added: <strong>{{ l.ownedCount }}</strong> / {{ l.requiredProductCount }}</span>
+      <button type="button" class="catalog-modal__quick-add" [disabled]="l.remainingSlots === 0 || quickAdding()" (click)="quickAddRandom()">
+        <mat-icon>auto_awesome</mat-icon>
+        {{ quickAdding() ? 'Adding…' : 'Quick add ' + l.remainingSlots + ' random' }}
+      </button>
+    }
+  </div>
+
+  <div class="catalog-modal__body">
+    @if (errorMessage()) {
+      <div class="catalog-modal__error">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="catalog-modal__state">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Loading catalog…</p>
+      </div>
+    } @else if (items().length === 0) {
+      <div class="catalog-modal__state">
+        <mat-icon>search_off</mat-icon>
+        <p>No products match your search.</p>
+      </div>
+    } @else {
+      <div class="catalog-modal__grid">
+        @for (item of items(); track item.id) {
+          <div class="catalog-modal__card">
+            <div class="catalog-modal__thumb-wrap">
+              @if (item.imageUrl) {
+                <img class="catalog-modal__thumb" [src]="fileUrl(item.imageUrl)" [alt]="item.name" (click)="openImage($event, item)" />
+              } @else {
+                <div class="catalog-modal__thumb catalog-modal__thumb--placeholder">
+                  <mat-icon>image</mat-icon>
+                </div>
+              }
+            </div>
+
+            <h3 class="catalog-modal__title">{{ item.name }}</h3>
+
+            <div class="catalog-modal__prices">
+              <span class="catalog-modal__chip catalog-modal__chip--cost">
+                <span class="catalog-modal__chip-label">COST</span>
+                <span class="catalog-modal__chip-value">{{ formatCurrency(item.cost) }}</span>
+              </span>
+              <span class="catalog-modal__chip catalog-modal__chip--sell">
+                <span class="catalog-modal__chip-label">SELL</span>
+                <span class="catalog-modal__chip-value">{{ formatCurrency(item.sell) }}</span>
+              </span>
+            </div>
+            <span class="catalog-modal__profit">
+              <mat-icon>arrow_upward</mat-icon>
+              {{ formatCurrency(item.profit) }} profit
+            </span>
+          </div>
+        }
+      </div>
+
+      <app-pager [page]="page()" [totalPages]="totalPages()" [totalCount]="totalCount()" (pageChange)="onPageChange($event)"></app-pager>
+    }
+  </div>
+</div>

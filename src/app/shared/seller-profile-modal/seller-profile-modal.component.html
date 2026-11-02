@@ -1,0 +1,39 @@
+<div class="bank-modal">
+  <header class="bank-modal__header">
+    <h2>Seller Details</h2>
+    <p>Your name, email, and store name.</p>
+  </header>
+
+  <form [formGroup]="form" class="bank-modal__body">
+    <label class="bank-modal__field">
+      <span>Full name</span>
+      <input type="text" formControlName="name" />
+      @if (form.controls.name.invalid && form.controls.name.touched) {
+        <span class="bank-modal__error">Full name is required</span>
+      }
+    </label>
+
+    <label class="bank-modal__field">
+      <span>Email</span>
+      <input type="email" formControlName="email" />
+      @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+        <span class="bank-modal__error">Email is required</span>
+      } @else if (form.controls.email.hasError('email') && form.controls.email.touched) {
+        <span class="bank-modal__error">Enter a valid email address</span>
+      }
+    </label>
+
+    <label class="bank-modal__field">
+      <span>Store name</span>
+      <input type="text" formControlName="storeName" />
+      @if (form.controls.storeName.invalid && form.controls.storeName.touched) {
+        <span class="bank-modal__error">Store name is required</span>
+      }
+    </label>
+  </form>
+
+  <footer class="bank-modal__footer">
+    <button type="button" class="bank-modal__btn bank-modal__btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="bank-modal__btn bank-modal__btn--solid" [disabled]="form.invalid" (click)="save()">Save</button>
+  </footer>
+</div>

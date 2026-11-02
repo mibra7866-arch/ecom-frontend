@@ -1,0 +1,39 @@
+<app-auth-card icon="shield" title="Admin Sign In" subtitle="Sign in to manage the MySellerStore marketplace">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+    @if (errorMessage()) {
+      <div class="form-banner">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Username</mat-label>
+      <mat-icon matPrefix>person</mat-icon>
+      <input matInput formControlName="username" autocomplete="username" />
+      @if (form.controls.username.invalid && (form.controls.username.touched || submitted())) {
+        <mat-error>Username is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Password</mat-label>
+      <mat-icon matPrefix>lock</mat-icon>
+      <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" autocomplete="current-password" />
+      <button mat-icon-button matSuffix type="button" (click)="hidePassword.set(!hidePassword())" [attr.aria-label]="'Toggle password visibility'">
+        <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      @if (form.controls.password.invalid && (form.controls.password.touched || submitted())) {
+        <mat-error>Password is required</mat-error>
+      }
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" class="submit-btn full-width" type="submit" [disabled]="loading()">
+      @if (loading()) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        Sign In
+      }
+    </button>
+  </form>
+</app-auth-card>

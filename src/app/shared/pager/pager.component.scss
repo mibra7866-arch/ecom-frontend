@@ -1,0 +1,31 @@
+@use '../styles/breakpoints' as bp;
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 4px;
+  color: var(--ecom-text-muted);
+  font-size: 0.85rem;
+
+  @include bp.mobile-xs {
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+}
+
+.pager__controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pager__page {
+  min-width: 110px;
+  text-align: center;
+
+  @include bp.mobile-xs {
+    min-width: 0;
+  }
+}

@@ -1,0 +1,72 @@
+// Canonical breakpoint scale for the whole app. Values reuse the widths already hardcoded across
+// ~20 files (480/560/640/768/900/1024) so existing @media rules can migrate onto this scale without
+// shifting behavior, plus two finer steps (360/400) to give the 320-430px phone range more control
+// than the old "560px and done" granularity provided.
+$bp-xs: 360px;
+$bp-sm: 400px;
+$bp-mobile: 480px;
+$bp-sm-tablet: 560px;
+$bp-tablet: 640px;
+$bp-md: 768px;
+$bp-lg: 900px;
+$bp-xl: 1024px;
+
+@mixin mobile-xs {
+  @media (max-width: $bp-xs) {
+    @content;
+  }
+}
+
+@mixin mobile-sm {
+  @media (max-width: $bp-sm) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: $bp-mobile) {
+    @content;
+  }
+}
+
+@mixin sm-tablet {
+  @media (max-width: $bp-sm-tablet) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $bp-tablet) {
+    @content;
+  }
+}
+
+@mixin below-md {
+  @media (max-width: $bp-md) {
+    @content;
+  }
+}
+
+@mixin below-lg {
+  @media (max-width: $bp-lg) {
+    @content;
+  }
+}
+
+@mixin below-xl {
+  @media (max-width: $bp-xl) {
+    @content;
+  }
+}
+
+@mixin landscape {
+  @media (max-width: $bp-xl) and (orientation: landscape) {
+    @content;
+  }
+}
+
+// Apply to any custom (non-Material) clickable control smaller than the touch-target guideline.
+@mixin touch-target($size: 44px) {
+  min-width: $size;
+  min-height: $size;
+}

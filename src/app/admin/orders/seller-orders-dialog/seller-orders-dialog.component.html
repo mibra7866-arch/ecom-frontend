@@ -1,0 +1,101 @@
+<div class="seller-orders-dialog">
+  <header class="seller-orders-dialog__header">
+    <div class="seller-orders-dialog__heading">
+      <h2>{{ seller.storeName }}</h2>
+      <p>{{ seller.name }} <app-verified-badge [verified]="seller.isVerified"></app-verified-badge> &middot; {{ totalCount() }} order{{ totalCount() === 1 ? '' : 's' }}</p>
+    </div>
+    <button type="button" class="seller-orders-dialog__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  @if (financialSummary(); as summary) {
+    <div class="seller-orders-dialog__financials">
+      <div class="seller-orders-dialog__financial">
+        <span class="seller-orders-dialog__financial-label">Total Orders</span>
+        <span class="seller-orders-dialog__financial-value">{{ summary.totalOrders }}</span>
+      </div>
+      <div class="seller-orders-dialog__financial">
+        <span class="seller-orders-dialog__financial-label">Total Orders Amount</span>
+        <span class="seller-orders-dialog__financial-value">{{ formatCurrency(summary.totalOrdersAmount) }}</span>
+      </div>
+      <div class="seller-orders-dialog__financial">
+        <span class="seller-orders-dialog__financial-label">Total Profit</span>
+        <span class="seller-orders-dialog__financial-value seller-orders-dialog__financial-value--green">{{ formatCurrency(summary.totalProfit) }}</span>
+      </div>
+    </div>
+  }
+
+  <div class="orders-tabs">
+    @for (tab of tabs; track tab.key) {
+      <button
+        type="button"
+        class="orders-tabs__pill"
+        [class.orders-tabs__pill--active]="activeTab() === tab.key"
+        (click)="setFilter(tab)"
+      >
+        <span class="orders-tabs__dot" [class]="tab.dotClass"></span>
+        {{ tab.label }}
+        @if (tabCount(tab) > 0) {
+          <span class="orders-tabs__count">{{ tabCount(tab) }}</span>
+        }
+      </button>
+    }
+  </div>
+
+  <div class="seller-orders-dialog__body">
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="seller-orders-dialog__state">
+        <mat-spinner diameter="26"></mat-spinner>
+      </div>
+    } @else if (orders().length === 0) {
+      <div class="seller-orders-dialog__state">
+        <mat-icon>assignment</mat-icon>
+        <p>No orders match this filter.</p>
+      </div>
+    } @else {
+      <div class="seller-orders-dialog__list">
+        @for (order of orders(); track order.id) {
+          <div class="seller-orders-row" (click)="openOrder(order)">
+            @if (order.productImageUrl) {
+              <img class="seller-orders-row__thumb" [src]="fileUrl(order.productImageUrl)" [alt]="order.productName" (click)="openImage($event, order)" />
+            } @else {
+              <div class="seller-orders-row__thumb seller-orders-row__thumb--placeholder">
+                <mat-icon>image</mat-icon>
+              </div>
+            }
+
+            <div class="seller-orders-row__info">
+              <span class="seller-orders-row__name">{{ order.productName }}</span>
+              <span class="seller-orders-row__meta">&times;{{ order.quantity }} &middot; {{ order.createdAt | date: 'MMM d' }} &middot; #{{ order.id }}</span>
+            </div>
+
+            <div class="seller-orders-row__prices">
+              <span class="seller-orders-row__amount">{{ order.amount | currency }}</span>
+              <span class="seller-orders-row__profit">
+                <mat-icon>arrow_upward</mat-icon>
+                {{ order.profit | currency }}
+              </span>
+            </div>
+
+            <span class="order-status-pill" [class]="statusClass(order)">
+              <span class="order-status-pill__dot"></span>
+              {{ statusLabel(order) }}
+            </span>
+
+            <mat-icon class="seller-orders-row__chevron">chevron_right</mat-icon>
+          </div>
+        }
+      </div>
+
+      <app-pager [page]="page()" [totalPages]="totalPages()" [totalCount]="totalCount()" (pageChange)="onPageChange($event)"></app-pager>
+    }
+  </div>
+</div>

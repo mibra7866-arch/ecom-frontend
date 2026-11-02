@@ -1,0 +1,39 @@
+<div class="fin-modal">
+  <header class="fin-modal__header">
+    <h2>{{ data.title }}</h2>
+    <p>Current {{ data.fieldLabel }}: <strong>{{ data.currentValue | currency }}</strong></p>
+  </header>
+
+  <div class="fin-modal__body">
+    <div class="fin-modal__toggle">
+      <button type="button" class="fin-modal__toggle-btn" [class.fin-modal__toggle-btn--active]="direction() === 'add'" (click)="direction.set('add')">
+        Add funds
+      </button>
+      <button type="button" class="fin-modal__toggle-btn" [class.fin-modal__toggle-btn--active]="direction() === 'deduct'" (click)="direction.set('deduct')">
+        Deduct funds
+      </button>
+    </div>
+
+    <label class="fin-modal__field">
+      <span>Amount</span>
+      <div class="fin-modal__amount">
+        <span>$</span>
+        <input type="number" min="0.01" step="0.01" placeholder="0.00" [value]="amount() ?? ''" (input)="onAmountInput($any($event.target).value)" />
+      </div>
+    </label>
+
+    <label class="fin-modal__field">
+      <span>Reason <span class="fin-modal__required">(required, for the audit trail)</span></span>
+      <textarea rows="2" [ngModel]="reason()" (ngModelChange)="reason.set($event)" placeholder="Why is this adjustment being made?"></textarea>
+    </label>
+
+    @if (amount()) {
+      <p class="fin-modal__preview">New {{ data.fieldLabel }} will be <strong>{{ resultingValue() | currency }}</strong></p>
+    }
+  </div>
+
+  <footer class="fin-modal__footer">
+    <button type="button" class="fin-modal__btn fin-modal__btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="fin-modal__btn fin-modal__btn--solid" [disabled]="!canApply()" (click)="apply()">Apply</button>
+  </footer>
+</div>

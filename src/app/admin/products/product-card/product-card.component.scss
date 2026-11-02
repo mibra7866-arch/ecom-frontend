@@ -1,0 +1,211 @@
+@use '../../../shared/styles/thumbnails' as thumb;
+@use '../../../shared/styles/breakpoints' as bp;
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--ecom-surface-alt);
+  border: 1px solid var(--ecom-border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.product-card__image-wrap {
+  position: relative;
+  // A fixed box (not width: 100% of the card) so the image is the exact same pixel size regardless of
+  // how many columns fit on a given page — see thumb.$thumb-grid-size. Grid rows use align-items:
+  // stretch by default, so a card next to a taller row-mate (one with a description) gets stretched
+  // past its own natural content height; flex: none keeps that extra height from coming out of the
+  // image instead of the (independent) text area below it.
+  width: thumb.$thumb-grid-size;
+  height: thumb.$thumb-grid-size;
+  flex: none;
+}
+
+.product-card__image {
+  // display: block (not the <img> default of inline) so width/height keep applying even when the
+  // image fails to load — a broken inline-rendered <img> sizes itself off its alt text instead of its
+  // box, which is what let a missing product photo collapse the thumbnail down to a sliver.
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--ecom-surface);
+
+  &--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ecom-text-muted);
+
+    mat-icon {
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+    }
+  }
+}
+
+img.product-card__image {
+  @include thumb.thumb-clickable;
+}
+
+// Below this width ProductsListComponent's grid track is no longer the fixed thumb.$thumb-grid-size —
+// it's fluid (repeat(2, 1fr)) so two cards can actually fit side by side — so the photo has to go back
+// to fluid too, or it would overflow its own (now narrower) card. Desktop keeps the fixed size untouched.
+@include bp.mobile {
+  .product-card__image-wrap {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+}
+
+// Dark gradient so the white price/profit text stays readable regardless of the underlying image.
+.product-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 45%);
+  pointer-events: none;
+}
+
+.product-card__price,
+.product-card__profit {
+  position: absolute;
+  bottom: 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.product-card__price {
+  left: 12px;
+}
+
+.product-card__profit {
+  right: 12px;
+  color: #4ade80;
+}
+
+.product-card__badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.85);
+  color: #ffffff;
+  font-size: 0.66rem;
+  font-weight: 700;
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+  }
+}
+
+.product-card__menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.product-card__menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(15, 20, 32, 0.55);
+  color: #ffffff;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(15, 20, 32, 0.75);
+  }
+}
+
+.product-card__menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  width: 176px;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--ecom-border);
+  background: var(--ecom-surface);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.product-card__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--ecom-text);
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+    color: var(--ecom-text-muted);
+  }
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+
+  &--red {
+    color: var(--ecom-red);
+
+    mat-icon {
+      color: var(--ecom-red);
+    }
+  }
+}
+
+.product-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 12px 14px;
+}
+
+.product-card__name {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-card__description {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

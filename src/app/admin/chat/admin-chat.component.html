@@ -1,0 +1,105 @@
+<div class="list-page">
+  <h1>Chat</h1>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <div class="admin-chat__body" [class.admin-chat__body--mobile]="isMobile()">
+    <div class="admin-chat__list" [class.admin-chat__list--hidden]="isMobile() && activeSeller()">
+      <div class="admin-chat__search">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search sellers..." [value]="searchQuery()" (input)="onSearchInput($any($event.target).value)" />
+      </div>
+
+      @if (searchQuery().trim()) {
+        <div class="admin-chat__search-results">
+          @if (searching()) {
+            <div class="admin-chat__search-loading">
+              <mat-spinner diameter="18"></mat-spinner>
+            </div>
+          } @else if (searchResults().length === 0) {
+            <p class="admin-chat__search-empty">No sellers match "{{ searchQuery() }}".</p>
+          } @else {
+            @for (result of searchResults(); track result.sellerId) {
+              <button type="button" class="admin-chat__search-result" (click)="startChatWithSeller(result)">
+                <span class="seller-row__avatar">{{ result.name.charAt(0).toUpperCase() }}</span>
+                <span class="admin-chat__search-result-text">
+                  <span class="seller-row__name">{{ result.name }}</span>
+                  <span class="seller-row__preview">{{ result.storeName }}</span>
+                </span>
+              </button>
+            }
+          }
+        </div>
+      }
+
+      @if (loading()) {
+        <div class="list-page__loading">
+          <mat-spinner diameter="24"></mat-spinner>
+        </div>
+      } @else if (rows().length === 0) {
+        <p class="list-page__empty">No sellers yet.</p>
+      } @else {
+        @for (row of rows(); track row.sellerId) {
+          <button
+            type="button"
+            class="seller-row"
+            [class.seller-row--active]="activeSeller()?.sellerId === row.sellerId"
+            (click)="select(row)"
+          >
+            <span class="seller-row__avatar">
+              @if (row.lastMessageAttachmentUrl && isImageUrl(row.lastMessageAttachmentUrl)) {
+                <img class="seller-row__avatar-photo" [src]="fileUrl(row.lastMessageAttachmentUrl)" alt="" />
+              } @else {
+                {{ row.sellerName.charAt(0).toUpperCase() }}
+              }
+              <span class="seller-row__dot" [class.seller-row__dot--online]="row.isOnline"></span>
+            </span>
+            <span class="seller-row__text">
+              <span class="seller-row__top">
+                <span class="seller-row__name">{{ row.sellerName }}</span>
+                @if (row.lastMessageAtUtc) {
+                  <span class="seller-row__time">{{ row.lastMessageAtUtc | date: 'short' }}</span>
+                }
+              </span>
+              <span class="seller-row__bottom">
+                <span class="seller-row__preview">
+                  @if (!row.lastMessagePreview?.trim() && row.lastMessageAttachmentUrl) {
+                    <mat-icon>{{ isImageUrl(row.lastMessageAttachmentUrl) ? 'image' : 'attach_file' }}</mat-icon>
+                    {{ isImageUrl(row.lastMessageAttachmentUrl) ? 'Photo' : 'Attachment' }}
+                  } @else {
+                    {{ row.lastMessagePreview ?? 'No messages yet' }}
+                  }
+                </span>
+                @if (row.unreadCount > 0) {
+                  <span class="seller-row__badge">{{ row.unreadCount }}</span>
+                }
+              </span>
+            </span>
+          </button>
+        }
+      }
+    </div>
+
+    <div class="admin-chat__thread" [class.admin-chat__thread--hidden]="isMobile() && !activeSeller()">
+      @if (activeSeller(); as seller) {
+        @if (isMobile()) {
+          <button type="button" class="admin-chat__back" (click)="backToList()">
+            <mat-icon>arrow_back</mat-icon>
+            {{ seller.name }}
+          </button>
+        }
+        <app-chat-thread [sellerId]="seller.sellerId" [counterpartLabel]="seller.name"></app-chat-thread>
+      } @else {
+        <div class="admin-chat__placeholder">
+          <mat-icon>forum</mat-icon>
+          <p>Select a seller to view the conversation.</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

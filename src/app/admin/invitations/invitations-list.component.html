@@ -1,0 +1,39 @@
+<div class="list-page scroll-fixed">
+  <div class="list-page__header">
+    <h1>LLC Code</h1>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="list-page__loading">
+      <mat-spinner diameter="28"></mat-spinner>
+    </div>
+  } @else if (invitation()) {
+    <div class="invite-card">
+      <p class="invite-card__hint">
+        Share this code with sellers so they register under your account. It's permanent and reusable — every seller
+        who signs up with it is assigned to you, with no limit on how many times it can be used.
+      </p>
+
+      <div class="invite-card__code-row">
+        <code class="invite-card__code">{{ invitation()!.code }}</code>
+        <button mat-icon-button (click)="copyCode()" aria-label="Copy code">
+          <mat-icon>content_copy</mat-icon>
+        </button>
+      </div>
+
+      <p class="invite-card__meta">Created {{ invitation()!.createdDate | date: 'mediumDate' }}</p>
+
+      <button mat-stroked-button color="warn" (click)="regenerate()">
+        <mat-icon>autorenew</mat-icon>
+        Regenerate code
+      </button>
+    </div>
+  }
+</div>

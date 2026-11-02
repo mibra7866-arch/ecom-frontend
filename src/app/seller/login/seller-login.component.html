@@ -1,0 +1,124 @@
+<div class="login-page">
+  <section class="brand-panel">
+    <div class="brand-panel__glow"></div>
+
+    <div class="brand-panel__top">
+      <div class="brand-panel__logo"><mat-icon>shopping_cart</mat-icon></div>
+      <div class="brand-panel__logo-text">
+        <span class="brand-panel__logo-title">Seller Portal</span>
+        <span class="brand-panel__logo-sub">E SELLER STORE</span>
+      </div>
+    </div>
+
+    <div class="brand-panel__content">
+      <div class="brand-panel__badge">
+        <mat-icon>home</mat-icon>
+        <span>Reseller marketplace</span>
+      </div>
+
+      <h1 class="brand-panel__heading">Welcome back to<br />your shop</h1>
+      <p class="brand-panel__text">
+        Manage your catalog, fulfill orders, and grow your earnings — all from one place.
+      </p>
+
+      <div class="brand-panel__features">
+        @for (feature of features; track feature.title) {
+          <div class="brand-panel__feature">
+            <div class="brand-panel__feature-icon"><mat-icon>{{ feature.icon }}</mat-icon></div>
+            <div class="brand-panel__feature-text">
+              <span class="brand-panel__feature-title">{{ feature.title }}</span>
+              <span class="brand-panel__feature-sub">{{ feature.subtitle }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="form-panel">
+    <a routerLink="/seller/landing" class="form-panel__back">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Back to home</span>
+    </a>
+
+    <div class="form-panel__content">
+      <h2 class="form-panel__heading">Seller sign in</h2>
+      <p class="form-panel__subtext">Access your shop dashboard to manage products and orders.</p>
+
+      @if (errorMessage()) {
+        <div class="form-banner">
+          <mat-icon>error</mat-icon>
+          <span>{{ errorMessage() }}</span>
+        </div>
+        @if (errorCode() === 'KYC_PENDING' || errorCode() === 'KYC_REJECTED') {
+          <button type="button" class="form-banner__support-link" (click)="openSupportChat()">
+            <mat-icon>headset_mic</mat-icon>
+            Questions about your review? Chat with support
+          </button>
+        }
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="login-form" novalidate>
+        <label class="field">
+          <span class="field__label">Email address</span>
+          <span
+            class="field__control"
+            [class.field__control--invalid]="form.controls.email.invalid && (form.controls.email.touched || submitted())"
+          >
+            <mat-icon>mail</mat-icon>
+            <input type="email" formControlName="email" placeholder="seller@example.com" autocomplete="email" />
+          </span>
+          @if (form.controls.email.invalid && (form.controls.email.touched || submitted())) {
+            <span class="field__error">A valid email address is required.</span>
+          }
+        </label>
+
+        <label class="field">
+          <span class="field__label">Password</span>
+          <span
+            class="field__control"
+            [class.field__control--invalid]="form.controls.password.invalid && (form.controls.password.touched || submitted())"
+          >
+            <mat-icon>lock</mat-icon>
+            <input
+              [type]="hidePassword() ? 'password' : 'text'"
+              formControlName="password"
+              placeholder="Your password"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="field__toggle"
+              (click)="hidePassword.set(!hidePassword())"
+              [attr.aria-label]="'Toggle password visibility'"
+            >
+              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </span>
+          @if (form.controls.password.invalid && (form.controls.password.touched || submitted())) {
+            <span class="field__error">Password is required.</span>
+          }
+        </label>
+
+        <button type="submit" class="submit-btn" [disabled]="loading() || form.invalid">
+          @if (loading()) {
+            <span class="submit-btn__spinner"></span>
+          } @else {
+            Sign in to your shop
+          }
+        </button>
+      </form>
+
+      <p class="form-panel__footnote">
+        Want to start selling? <a routerLink="/seller/signup">Register a Store</a>
+      </p>
+      <!-- TODO: point to the real customer login route once the app has one -->
+      <p class="form-panel__footnote form-panel__footnote--muted">
+        Customer? <a routerLink="/" class="form-panel__underline-link">Customer login</a>
+      </p>
+      <p class="form-panel__footnote form-panel__footnote--muted">
+        Having trouble signing in? <button type="button" class="form-panel__link-btn" (click)="openSupportChat()">Chat with support</button>
+      </p>
+    </div>
+  </section>
+</div>

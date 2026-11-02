@@ -1,0 +1,18 @@
+<div class="image-preview" (click)="close()">
+  <div class="image-preview__frame" (click)="$event.stopPropagation()">
+    @if (!loaded()) {
+      <div class="image-preview__spinner"></div>
+    }
+    <img
+      class="image-preview__img"
+      [class.image-preview__img--loaded]="loaded()"
+      [src]="data.url"
+      [alt]="data.alt"
+      (load)="loaded.set(true)"
+      (error)="loaded.set(true)"
+    />
+    <button type="button" class="image-preview__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>

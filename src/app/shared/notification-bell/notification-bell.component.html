@@ -1,0 +1,83 @@
+<div class="notif-bell" [class.notif-bell--sidebar]="variant === 'sidebar-link'">
+  @if (variant === 'sidebar-link') {
+    <button #trigger type="button" class="notif-bell__trigger notif-bell__trigger--sidebar" [attr.aria-expanded]="open" (click)="toggle()">
+      <mat-icon>notifications</mat-icon>
+      <span>{{ label }}</span>
+      @if (unreadCount() > 0) {
+        <span class="notif-bell__badge">{{ unreadCount() }}</span>
+      }
+    </button>
+  } @else if (variant === 'tab-bar') {
+    <button #trigger type="button" class="notif-bell__trigger notif-bell__trigger--tab-bar" [attr.aria-expanded]="open" (click)="toggle()">
+      <span class="notif-bell__tab-bar-icon">
+        <mat-icon>notifications</mat-icon>
+        @if (unreadCount() > 0) {
+          <span class="notif-bell__badge notif-bell__badge--floating">{{ unreadCount() }}</span>
+        }
+      </span>
+      <span>{{ label }}</span>
+    </button>
+  } @else {
+    <button
+      #trigger
+      type="button"
+      class="notif-bell__trigger notif-bell__trigger--icon"
+      [attr.aria-label]="label"
+      [attr.aria-expanded]="open"
+      (click)="toggle()"
+    >
+      <mat-icon>notifications</mat-icon>
+      @if (unreadCount() > 0) {
+        <span class="notif-bell__badge notif-bell__badge--floating">{{ unreadCount() }}</span>
+      }
+    </button>
+  }
+</div>
+
+<ng-template #panelTemplate>
+  <div class="notif-bell__panel">
+    <div class="notif-bell__header">
+      <span>Notifications</span>
+      @if (unreadCount() > 0) {
+        <button type="button" class="notif-bell__mark-all" (click)="markAllRead($event)">Mark all as read</button>
+      }
+    </div>
+
+    <div class="notif-bell__list">
+      @if (loading() && notifications().length === 0) {
+        <div class="notif-bell__spinner-wrap">
+          <span class="notif-bell__spinner"></span>
+        </div>
+      }
+
+      @if (!loading() && notifications().length === 0) {
+        <div class="notif-bell__empty">
+          <mat-icon>notifications_none</mat-icon>
+          <p>You're all caught up.</p>
+        </div>
+      }
+
+      @for (notification of notifications(); track notification.id) {
+        <button
+          type="button"
+          class="notif-bell__row"
+          [class.notif-bell__row--unread]="!notification.isRead"
+          (click)="select(notification)"
+        >
+          <mat-icon class="notif-bell__row-icon">{{ iconFor(notification.type) }}</mat-icon>
+          <span class="notif-bell__row-body">
+            <span class="notif-bell__row-title">{{ notification.title }}</span>
+            <span class="notif-bell__row-text">{{ notification.body }}</span>
+            <span class="notif-bell__row-time">{{ formatRelative(notification.createdAtUtc) }}</span>
+          </span>
+        </button>
+      }
+
+      @if (hasMore() && notifications().length > 0) {
+        <button type="button" class="notif-bell__load-more" [disabled]="loading()" (click)="loadMore()">
+          {{ loading() ? 'Loading…' : 'Load more' }}
+        </button>
+      }
+    </div>
+  </div>
+</ng-template>

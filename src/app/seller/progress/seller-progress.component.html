@@ -1,0 +1,70 @@
+@if (loading()) {
+  <div class="state state--loading">
+    <span class="spinner"></span>
+    <p>Loading your progress…</p>
+  </div>
+} @else if (errorMessage()) {
+  <div class="state state--error">
+    <mat-icon>error</mat-icon>
+    <p>{{ errorMessage() }}</p>
+    <button type="button" class="retry-btn" (click)="load()">Retry</button>
+  </div>
+} @else if (summary(); as s) {
+  <div class="progress-page">
+    <div class="progress-header">
+      <span class="progress-header__icon"><mat-icon>military_tech</mat-icon></span>
+      <div>
+        <h1>Store Progress</h1>
+        <p class="progress-header__subtext">Setup and stage advancement</p>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="panel__header">
+        <div class="panel__header-title">
+          <mat-icon>widgets</mat-icon>
+          <h2>Product Setup</h2>
+        </div>
+        <span class="panel__muted">{{ s.totalProducts }} / {{ s.requiredProductCount }}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-bar__fill" [style.width.%]="productSetupPercent(s)"></div>
+      </div>
+      @if (s.totalProducts >= s.requiredProductCount) {
+        <p class="panel__hint panel__hint--done"><mat-icon>check_circle</mat-icon> Your store is fully stocked.</p>
+      } @else {
+        <p class="panel__hint">Our Support team is populating your store's catalog. Check back soon.</p>
+      }
+      @if (s.isBoosted) {
+        <p class="panel__hint panel__hint--boost"><mat-icon>trending_up</mat-icon> Your store is currently promoted.</p>
+      }
+    </section>
+
+    <section class="panel">
+      <div class="panel__header">
+        <div class="panel__header-title">
+          <mat-icon>military_tech</mat-icon>
+          <h2>Order Stage</h2>
+        </div>
+        <span class="panel__badge">Stage {{ s.stageProgress.currentStageNumber }}</span>
+      </div>
+
+      @if (s.stageProgress.minAmount !== null && s.stageProgress.maxAmount !== null) {
+        <p class="panel__hint">
+          You can currently be assigned orders between <strong>{{ formatCurrency(s.stageProgress.minAmount) }}</strong> and
+          <strong>{{ formatCurrency(s.stageProgress.maxAmount) }}</strong>.
+        </p>
+        <div class="progress-bar">
+          <div class="progress-bar__fill" [style.width.%]="stagePercent(s)"></div>
+        </div>
+        <p class="panel__hint">
+          {{ s.stageProgress.completedInCurrentStage }} / {{ s.stageProgress.requiredCompletions }} completions toward the next stage
+        </p>
+      } @else {
+        <p class="panel__hint">No order stages are configured yet — you can be assigned any order.</p>
+      }
+
+      <button type="button" class="panel__btn" (click)="goToOrders()"><mat-icon>shopping_cart</mat-icon>View orders</button>
+    </section>
+  </div>
+}

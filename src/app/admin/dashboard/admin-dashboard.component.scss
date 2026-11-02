@@ -1,0 +1,151 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+}
+
+.dashboard {
+  // Top/bottom match .shell__sidenav's own 20px top/bottom padding so the dashboard's content
+  // box starts and ends flush with the sidebar's, instead of the 18px/20px mismatch it had before.
+  padding: 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.dashboard__banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: var(--ecom-amber);
+  font-size: 0.85rem;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(245, 158, 11, 0.18);
+  }
+
+  mat-icon {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+
+  button {
+    margin-left: auto;
+    color: var(--ecom-amber);
+  }
+}
+
+.dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+
+  &--compact {
+    .stat-card,
+    app-stat-card {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.dashboard__panels {
+  // Flexbox (not grid) so align-items:stretch has unambiguous "fill the container's own height"
+  // semantics — a grid's auto-sized row track isn't guaranteed to grow to fill extra block space
+  // the same way, and a canvas-based chart makes that ambiguity risky to depend on.
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+
+  // Only stretch to fill leftover height in the desktop 2-column layout — in the stacked
+  // single-column layout below, extra flex space has nowhere sensible to go between two
+  // full-width stacked cards, so forcing flex:1 there would just leave a blank gap under them.
+  @media (min-width: 901px) {
+    flex: 1;
+    min-height: 0;
+  }
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+  }
+}
+
+.dashboard__chart-panel {
+  background: var(--ecom-surface);
+  border: 1px solid var(--ecom-border);
+  border-radius: var(--ecom-radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 2 1 0%;
+  min-width: 0;
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    color: var(--ecom-text);
+  }
+}
+
+.dashboard__activity-panel {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.dashboard__stage-panel {
+  background: var(--ecom-surface);
+  border: 1px solid var(--ecom-border);
+  border-radius: var(--ecom-radius);
+  padding: 16px;
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    color: var(--ecom-text);
+  }
+}
+
+.dashboard__stage-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dashboard__stage-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--ecom-surface-alt);
+  border: 1px solid var(--ecom-border);
+  font-size: 0.85rem;
+}
+
+.dashboard__stage-chip-number {
+  color: var(--ecom-text-muted);
+  font-weight: 600;
+}
+
+.dashboard__stage-chip-count {
+  color: var(--ecom-text);
+  font-weight: 700;
+}

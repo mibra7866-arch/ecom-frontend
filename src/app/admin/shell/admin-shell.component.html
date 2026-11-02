@@ -1,0 +1,59 @@
+<mat-sidenav-container class="shell">
+  <mat-sidenav
+    [mode]="isMobile() ? 'over' : 'side'"
+    [opened]="isMobile() ? sidenavOpened() : true"
+    (openedChange)="sidenavOpened.set($event)"
+    class="shell__sidenav"
+  >
+    <div class="shell__brand">
+      <mat-icon>storefront</mat-icon>
+      <span>MySellerStore Admin</span>
+      <app-notification-bell></app-notification-bell>
+    </div>
+
+    <a mat-button class="shell__dashboard-link" routerLink="/admin/dashboard" routerLinkActive="active" (click)="closeSidenavIfMobile()">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </a>
+
+    @for (group of navGroups; track group.label) {
+      <div class="shell__group">
+        <p class="shell__group-label">{{ group.label }}</p>
+        @for (item of group.items; track item.route) {
+          <a mat-button class="shell__link" [routerLink]="item.route" routerLinkActive="active" (click)="closeSidenavIfMobile()">
+            <mat-icon>{{ item.icon }}</mat-icon>
+            {{ item.label }}
+            @if (item.badgeCount && item.badgeCount() > 0) {
+              <span class="shell__badge">{{ item.badgeCount() }}</span>
+            }
+          </a>
+        }
+        @if (group.label === 'ACCOUNT' && isSuperAdmin()) {
+          <a mat-button class="shell__link" routerLink="/admin/admins" routerLinkActive="active" (click)="closeSidenavIfMobile()">
+            <mat-icon>admin_panel_settings</mat-icon>
+            Admins
+          </a>
+        }
+      </div>
+    }
+
+    <div class="shell__footer">
+      <button mat-stroked-button (click)="logout()" class="shell__logout">
+        <mat-icon>logout</mat-icon>
+        Sign out
+      </button>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="shell__content">
+    @if (isMobile()) {
+      <header class="shell__mobile-topbar">
+        <button mat-icon-button (click)="toggleSidenav()" aria-label="Open navigation">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span class="shell__mobile-topbar-title">MySellerStore Admin</span>
+      </header>
+    }
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,0 +1,212 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+}
+
+.topup-detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 90vh;
+}
+
+.topup-detail__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 16px;
+  flex: none;
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ecom-text);
+  }
+}
+
+.topup-detail__close {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+    color: var(--ecom-text);
+  }
+}
+
+.topup-detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 28px 24px;
+  overflow-y: auto;
+}
+
+.error-banner {
+  margin: 0;
+}
+
+.topup-detail__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ecom-border);
+}
+
+.topup-detail__label {
+  font-size: 0.8rem;
+  color: var(--ecom-text-muted);
+  flex: none;
+}
+
+.topup-detail__value {
+  font-size: 0.9rem;
+  color: var(--ecom-text);
+  text-align: right;
+}
+
+.topup-detail__amount {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ecom-green);
+}
+
+.topup-detail__receipt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .topup-detail__label {
+    text-align: left;
+  }
+}
+
+// Wraps .topup-detail__receipt-image below — resets browser default <button> chrome so the clickable
+// thumbnail (opens the lightbox) is visually identical to the plain link it replaced.
+.topup-detail__receipt-image-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.topup-detail__receipt-image {
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid var(--ecom-border);
+  background: var(--ecom-surface-alt);
+}
+
+.topup-detail__receipt-pdf {
+  width: 100%;
+  height: 320px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 10px;
+}
+
+.topup-detail__receipt-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--ecom-border);
+  color: var(--ecom-indigo);
+  text-decoration: none;
+  font-size: 0.85rem;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+.topup-detail__footer {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 28px 24px;
+  border-top: 1px solid var(--ecom-border);
+}
+
+.topup-detail__btn {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.86rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.topup-detail__btn--green {
+  background: var(--ecom-green);
+  color: #0b0f19;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+}
+
+.topup-detail__btn--outline-red {
+  background: none;
+  border: 1px solid var(--ecom-red);
+  color: var(--ecom-red);
+
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.12);
+  }
+}
+
+.topup-detail__btn--ghost {
+  background: none;
+  border: 1px solid var(--ecom-border);
+  color: var(--ecom-text-muted);
+
+  &:hover:not(:disabled) {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+.topup-detail__confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  width: 100%;
+  font-size: 0.85rem;
+  color: var(--ecom-text);
+  text-align: right;
+}
+
+.topup-detail__confirm-actions {
+  display: flex;
+  gap: 10px;
+}

@@ -1,0 +1,67 @@
+<div class="assign-dialog">
+  <header class="assign-dialog__header">
+    <div>
+      <h2>Assign Order</h2>
+      <p>{{ data.product.name }} — {{ formatCurrency(data.product.price) }}</p>
+    </div>
+    <button type="button" class="assign-dialog__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="assign-dialog__body">
+    @if (successMessage()) {
+      <div class="assign-dialog__success">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ successMessage() }}</span>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="assign-dialog__error">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <div class="assign-dialog__search">
+      <mat-icon>search</mat-icon>
+      <input type="text" placeholder="Search by name, email, store, or seller ID..." [value]="query()" (input)="onSearchInput($any($event.target).value)" />
+    </div>
+
+    @if (searching()) {
+      <div class="assign-dialog__state">
+        <mat-spinner diameter="22"></mat-spinner>
+      </div>
+    } @else if (query().trim() && results().length === 0) {
+      <p class="assign-dialog__empty">No sellers match "{{ query() }}".</p>
+    } @else {
+      <ul class="assign-dialog__results">
+        @for (seller of results(); track seller.sellerId) {
+          <li class="assign-dialog__result">
+            <span class="assign-dialog__avatar">{{ seller.name.charAt(0).toUpperCase() }}</span>
+            <span class="assign-dialog__result-text">
+              <span class="assign-dialog__result-name">
+                {{ seller.name }}
+                @if (seller.status !== 'Active') {
+                  <span class="assign-dialog__inactive-tag">{{ seller.status === 'PendingKyc' ? 'Pending KYC' : 'Suspended' }}</span>
+                }
+              </span>
+              <span class="assign-dialog__result-meta">{{ seller.email }} · ID {{ seller.sellerId }}</span>
+              <span class="assign-dialog__result-balance">Balance: {{ formatCurrency(seller.balance) }}</span>
+            </span>
+            <button
+              type="button"
+              class="assign-dialog__assign-btn"
+              [disabled]="assigningId() !== null || seller.status !== 'Active'"
+              [title]="seller.status !== 'Active' ? 'Only active sellers can be assigned orders' : ''"
+              (click)="assign(seller)"
+            >
+              {{ assigningId() === seller.sellerId ? 'Assigning…' : 'Assign' }}
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>

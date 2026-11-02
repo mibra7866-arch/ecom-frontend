@@ -1,0 +1,234 @@
+<div class="seller-detail">
+  <header class="seller-detail__header">
+    <div>
+      <h2>{{ data.seller.storeName }}</h2>
+      <p>{{ data.seller.name }} <app-verified-badge [verified]="data.seller.isVerified"></app-verified-badge> · {{ data.seller.email }}</p>
+    </div>
+    <button type="button" class="seller-detail__close" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="seller-detail__body">
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <section class="seller-detail__section">
+      <div class="seller-detail__section-header">
+        <h3>Bank Details</h3>
+        @if (!bankDetailsLoading()) {
+          <button type="button" class="seller-detail__link-btn" (click)="editBankDetails()">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+        }
+      </div>
+
+      @if (bankDetailsLoading()) {
+        <mat-spinner diameter="22"></mat-spinner>
+      } @else if (bankDetails()?.accountHolderName) {
+        <dl class="seller-detail__grid">
+          <dt>Account holder</dt>
+          <dd>{{ bankDetails()!.accountHolderName }}</dd>
+          <dt>Bank</dt>
+          <dd>{{ bankDetails()!.bankName }}</dd>
+          <dt>Account number</dt>
+          <dd>{{ bankDetails()!.accountNumber }}</dd>
+          @if (bankDetails()!.iban) {
+            <dt>IBAN</dt>
+            <dd>{{ bankDetails()!.iban }}</dd>
+          }
+        </dl>
+      } @else {
+        <p class="seller-detail__empty">No bank details on file yet.</p>
+      }
+    </section>
+
+    <section class="seller-detail__section" #kycSection>
+      <div class="seller-detail__section-header">
+        <h3>KYC Verification</h3>
+        @if (kyc()) {
+          <app-status-badge [status]="kyc()!.status"></app-status-badge>
+        }
+      </div>
+
+      @if (kycLoading()) {
+        <mat-spinner diameter="22"></mat-spinner>
+      } @else if (kyc(); as submission) {
+        @if (submission.status === 'Rejected' && submission.rejectionReason) {
+          <div class="kyc-reject-reason">
+            <strong>Rejection reason:</strong>
+            <span>{{ submission.rejectionReason }}</span>
+          </div>
+        }
+
+        <div class="kyc-documents">
+          @for (url of submission.documentUrls; track url; let i = $index) {
+            <div class="kyc-documents__row">
+              <button type="button" class="kyc-documents__link" (click)="openDocument(url)">
+                <mat-icon>{{ isImageUrl(url) ? 'image' : 'description' }}</mat-icon>
+                Document {{ i + 1 }}
+              </button>
+              <span class="kyc-documents__uploader">{{ isAdminUploaded(url) ? 'Admin' : 'Seller' }}</span>
+              <button
+                type="button"
+                class="kyc-documents__delete"
+                [disabled]="deletingDocumentUrl() === url"
+                (click)="deleteDocument(url)"
+                aria-label="Delete document"
+              >
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        @if (submission.status === 'AwaitingVerification') {
+          <div class="seller-detail__kyc-actions">
+            <button type="button" class="seller-detail__btn seller-detail__btn--outline-red" [disabled]="submitting()" (click)="rejectKyc()">Reject</button>
+            <button type="button" class="seller-detail__btn seller-detail__btn--green" [disabled]="submitting()" (click)="approveKyc()">Approve</button>
+          </div>
+        } @else if (submission.status === 'Rejected') {
+          <p class="seller-detail__empty">Rejected — the seller can resubmit from their portal.</p>
+        }
+
+        <div class="kyc-upload">
+          <span class="seller-detail__subheading">Add / replace documents</span>
+          @if (kycUploadError()) {
+            <div class="error-banner">
+              <mat-icon>error</mat-icon>
+              <span>{{ kycUploadError() }}</span>
+            </div>
+          }
+          <app-file-upload
+            [files]="kycUploadFiles()"
+            (filesSelected)="onKycUploadFilesSelected($event)"
+            (fileRemoved)="onKycUploadFileRemoved($event)"
+            theme="light"
+            [dense]="true"
+          ></app-file-upload>
+          <button
+            type="button"
+            class="seller-detail__btn seller-detail__btn--green"
+            [disabled]="kycUploadFiles().length === 0 || kycUploadSubmitting()"
+            (click)="submitKycDocuments()"
+          >
+            {{ kycUploadSubmitting() ? 'Uploading…' : 'Upload documents' }}
+          </button>
+        </div>
+      } @else {
+        <p class="seller-detail__empty">This seller hasn't submitted KYC documents yet.</p>
+      }
+
+      <h4 class="seller-detail__subheading">Submission History</h4>
+      @if (kycHistoryLoading()) {
+        <mat-spinner diameter="22"></mat-spinner>
+      } @else if (kycHistory().length === 0) {
+        <p class="seller-detail__empty">No submission history.</p>
+      } @else {
+        <ul class="kyc-history-list">
+          @for (h of kycHistory(); track h.id) {
+            <li>
+              <div class="kyc-history-list__row">
+                <app-status-badge [status]="h.status"></app-status-badge>
+                <span class="kyc-history-list__date">{{ h.createdAt | date: 'medium' }}</span>
+              </div>
+              @if (h.reviewedAt) {
+                <span class="kyc-history-list__meta">Reviewed {{ h.reviewedAt | date: 'medium' }}</span>
+              }
+              @if (h.rejectionReason) {
+                <span class="kyc-history-list__meta">Reason: {{ h.rejectionReason }}</span>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="seller-detail__section">
+      <div class="seller-detail__section-header">
+        <h3>Store Monitoring</h3>
+      </div>
+
+      @if (monitoringLoading()) {
+        <mat-spinner diameter="22"></mat-spinner>
+      } @else if (monitoring(); as m) {
+        <dl class="seller-detail__grid">
+          <dt>Products in store</dt>
+          <dd>{{ m.productsInStore }} / {{ m.requiredProductCount }}</dd>
+          <dt>Order stage</dt>
+          <dd>
+            Stage {{ m.currentStageNumber }}
+            @if (m.stageMinAmount !== null && m.stageMaxAmount !== null) {
+              ({{ formatCurrency(m.stageMinAmount) }} – {{ formatCurrency(m.stageMaxAmount) }})
+            }
+          </dd>
+          @if (m.requiredCompletions !== null) {
+            <dt>Stage completions</dt>
+            <dd>{{ m.completedInCurrentStage }} / {{ m.requiredCompletions }}</dd>
+          }
+        </dl>
+
+        <dl class="seller-detail__grid">
+          <dt>Total orders</dt>
+          <dd>{{ m.totalOrders }}</dd>
+          <dt>Completed</dt>
+          <dd>{{ m.completedOrders }}</dd>
+          <dt>Pending</dt>
+          <dd>{{ m.pendingOrders }}</dd>
+          <dt>Paid</dt>
+          <dd>{{ m.paidOrders }}</dd>
+          <dt>Unpaid</dt>
+          <dd>{{ m.unpaidOrders }}</dd>
+        </dl>
+
+        <h4 class="seller-detail__subheading">Recent Orders</h4>
+        @if (m.recentOrders.length === 0) {
+          <p class="seller-detail__empty">No orders yet.</p>
+        } @else {
+          <ul class="seller-detail__activity-list">
+            @for (o of m.recentOrders; track o.id) {
+              <li>
+                <span>#{{ o.id }} — {{ o.productName }}</span>
+                <span>{{ formatCurrency(o.amount) }}</span>
+                <app-status-badge [status]="o.status"></app-status-badge>
+              </li>
+            }
+          </ul>
+        }
+
+        <h4 class="seller-detail__subheading">Recent Recharges</h4>
+        @if (m.recentTopUps.length === 0) {
+          <p class="seller-detail__empty">No recharges yet.</p>
+        } @else {
+          <ul class="seller-detail__activity-list">
+            @for (t of m.recentTopUps; track t.id) {
+              <li>
+                <span>{{ formatCurrency(t.amount) }}</span>
+                <app-status-badge [status]="t.status"></app-status-badge>
+              </li>
+            }
+          </ul>
+        }
+
+        <h4 class="seller-detail__subheading">Recent Withdrawals</h4>
+        @if (m.recentWithdrawals.length === 0) {
+          <p class="seller-detail__empty">No withdrawals yet.</p>
+        } @else {
+          <ul class="seller-detail__activity-list">
+            @for (w of m.recentWithdrawals; track w.id) {
+              <li>
+                <span>{{ formatCurrency(w.amount) }} · {{ w.method === 'Wallet' ? 'Wallet' : 'Bank Transfer' }}</span>
+                <app-status-badge [status]="w.status"></app-status-badge>
+              </li>
+            }
+          </ul>
+        }
+      }
+    </section>
+  </div>
+</div>

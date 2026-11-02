@@ -1,0 +1,218 @@
+:host {
+  display: block;
+}
+
+.requests-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.requests-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.requests-header__title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.requests-header__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #16a34a;
+  color: #ffffff;
+  flex: none;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.requests-header__title {
+  margin: 0;
+  // Was 1.9rem — noticeably larger than the shared .list-page h1 (1.6rem) used for the equivalent
+  // page-title role elsewhere in both portals (admin's list pages, seller Orders). Brought closer
+  // for a consistent heading scale without losing this page's own prominence.
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.requests-header__subtext {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: var(--ecom-text-muted);
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #0f1f3d;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: #16264a;
+  }
+}
+
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.request-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--ecom-border);
+  border-radius: 12px;
+  background: var(--ecom-surface);
+}
+
+.request-row__main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.request-row__amount {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ecom-text);
+}
+
+.request-row__date {
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+}
+
+.request-row__end {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.request-row__reason {
+  font-size: 0.78rem;
+  color: var(--ecom-red);
+  max-width: 260px;
+  text-align: right;
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 40vh;
+  color: var(--ecom-text-muted);
+  text-align: center;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: var(--ecom-text-muted);
+  }
+}
+
+.state--error mat-icon {
+  color: var(--ecom-red);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--ecom-border);
+  border-top-color: #0f1f3d;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.retry-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--ecom-border);
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+@media (max-width: 640px) {
+  .requests-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-btn {
+    justify-content: center;
+  }
+
+  .request-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .request-row__end {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .requests-header__title {
+    font-size: 1.25rem;
+  }
+
+  .requests-header__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+
+    mat-icon {
+      font-size: 17px;
+      width: 17px;
+      height: 17px;
+    }
+  }
+}

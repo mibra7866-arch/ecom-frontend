@@ -1,0 +1,196 @@
+@forward '../../../shared/styles/dialog-form';
+@use '../../../shared/styles/thumbnails' as thumb;
+
+// Self-contained max-height (viewport units), same proven shape as _assign-dialog.scss — deliberately
+// NOT `height: 100%`, which only resolves against an ancestor that itself has a defined height. The
+// mat-dialog-container's own height is otherwise content-driven, so a 100%-height child here would never
+// actually get constrained, and `.bulk-create__body`'s `overflow-y: auto` would have nothing to scroll
+// against — the modal would just grow past the viewport instead. Capping this element directly in vh
+// guarantees the header/footer stay pinned and the row list scrolls, regardless of how many rows exist.
+:host {
+  display: flex;
+  flex-direction: column;
+  background: var(--ecom-surface);
+  color: var(--ecom-text);
+}
+
+.bulk-create {
+  display: flex;
+  flex-direction: column;
+  max-height: 88vh;
+}
+
+.bulk-create__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bank-modal__header,
+.bank-modal__footer {
+  flex: none;
+}
+
+.product-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.product-form__error {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--ecom-red);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.product-form__checkbox {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+
+  input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    flex: none;
+  }
+
+  span {
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: var(--ecom-text);
+  }
+}
+
+.bulk-create__limit-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: var(--ecom-amber);
+  font-size: 0.82rem;
+  font-weight: 500;
+
+  mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.bulk-create__empty {
+  margin: 0;
+  padding: 24px 12px;
+  text-align: center;
+  border-radius: 10px;
+  border: 1px dashed var(--ecom-border);
+  color: var(--ecom-text-muted);
+  font-size: 0.85rem;
+}
+
+.bulk-create__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bulk-create__row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--ecom-border);
+  background: var(--ecom-surface-alt);
+}
+
+.bulk-create__row-main {
+  display: flex;
+  gap: 14px;
+}
+
+.bulk-create__thumb {
+  @include thumb.thumb-row;
+  @include thumb.thumb-clickable;
+  background: #ffffff;
+  border: 1px solid var(--ecom-border);
+}
+
+.bulk-create__row-fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bulk-create__row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bulk-create__row-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ecom-text-muted);
+  text-transform: uppercase;
+}
+
+.bulk-create__row-error {
+  margin: 0;
+}
+
+.bulk-create__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--ecom-text-muted);
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--ecom-red);
+  }
+}
+
+// Small screens: stack the thumbnail above the fields instead of side-by-side, and let row fields
+// collapse to a single column so nothing gets clipped — the modal itself still scrolls vertically via
+// .bulk-create__body regardless of viewport width.
+@media (max-width: 480px) {
+  .bulk-create__row-main {
+    flex-direction: column;
+  }
+
+  .bulk-create__thumb {
+    width: 100%;
+    height: 140px;
+  }
+
+  .product-form__row {
+    grid-template-columns: 1fr;
+  }
+}

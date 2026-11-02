@@ -1,0 +1,46 @@
+// Layout styles for this screen live in the global .list-page utility classes (src/styles.scss).
+@use '../../shared/styles/status-tabs' as status-tabs;
+
+// Same dark-blue filled toggle-group as Sellers/KYC Review/Top-Up's status filters.
+.list-page__filters mat-button-toggle-group {
+  @include status-tabs.dark-blue-toggle-group;
+}
+
+.list-cards .list-card {
+  cursor: pointer;
+}
+
+.withdrawal-row {
+  cursor: pointer;
+}
+
+.withdrawal-receipt-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  // Reset browser default <button> chrome — this class now also renders as a <button> for image
+  // receipts (opens the lightbox) alongside the plain <a> it already used for non-image ones; these
+  // resets are no-ops for the <a> case.
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--ecom-indigo);
+  text-decoration: none;
+  font: inherit;
+  font-size: 0.85rem;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.withdrawal-receipt-none {
+  color: var(--ecom-text-muted);
+}

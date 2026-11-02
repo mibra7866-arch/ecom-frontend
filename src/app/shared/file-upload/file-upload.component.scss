@@ -1,0 +1,138 @@
+.file-drop {
+  border: 1.5px dashed var(--ecom-border);
+  border-radius: 12px;
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--ecom-text-muted);
+  // The whole dropzone (icon included) opens the file picker now, not just the "browse" text.
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--ecom-indigo);
+    outline-offset: 2px;
+  }
+
+  mat-icon {
+    font-size: 32px;
+    height: 32px;
+    width: 32px;
+    color: var(--ecom-indigo);
+  }
+}
+
+.file-drop__label {
+  margin: 8px 0 4px;
+  color: var(--ecom-text);
+}
+
+.file-drop__browse {
+  color: var(--ecom-indigo);
+  cursor: pointer;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.file-drop__hint {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.file-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.file-list__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ecom-surface-alt);
+  border: 1px solid var(--ecom-border);
+  border-radius: 8px;
+  padding: 6px 8px 6px 12px;
+  font-size: 0.85rem;
+
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    color: var(--ecom-text-muted);
+  }
+}
+
+.file-list__name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-list__thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex: none;
+}
+
+// Light variant for hosts embedded in an otherwise-light surface (e.g. the top-up modal) — the base
+// rules above intentionally keep using the global dark --ecom-* tokens unchanged so the existing
+// (dark) signup wizard / seller-home KYC upload usages get zero visual change.
+.file-upload--light {
+  .file-drop {
+    border-color: #d1d5db;
+    color: #9ca3af;
+
+    mat-icon {
+      color: #0f1f3d;
+    }
+  }
+
+  .file-drop__label {
+    color: #111827;
+  }
+
+  .file-drop__browse {
+    color: #0f1f3d;
+  }
+
+  .file-list__item {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+    color: #111827;
+
+    mat-icon:not(.file-list__thumb) {
+      color: #9ca3af;
+    }
+  }
+}
+
+// Compact dropzone for space-constrained hosts (the top-up modal) — shrinks padding/icon/text
+// without touching the default size the signup wizard and seller-home KYC upload still use.
+.file-upload--dense {
+  .file-drop {
+    padding: 12px 14px;
+
+    mat-icon {
+      font-size: 22px;
+      height: 22px;
+      width: 22px;
+    }
+  }
+
+  .file-drop__label {
+    margin: 4px 0 2px;
+    font-size: 0.85rem;
+  }
+
+  .file-drop__hint {
+    font-size: 0.74rem;
+  }
+}

@@ -1,0 +1,338 @@
+// :host and the .list-page override below give this page (and only this page — Angular scopes
+// component styles, so other admin list pages using the shared global .list-page class are
+// unaffected) a height bounded by the admin shell's content pane, instead of .list-page's normal
+// auto/grows-with-content sizing. Without this, .admin-chat__body's height was a hardcoded
+// calc(100vh - Npx) that drifted out of sync with the real header height and let the whole dashboard
+// content pane scroll instead of just the message list inside app-chat-thread.
+@use '../../shared/styles/breakpoints' as bp;
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.list-page {
+  height: 100%;
+  min-height: 0;
+}
+
+.admin-chat__body {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+
+  // A fixed 320px sidebar plus a thread pane has nowhere near enough room on a 320-430px phone — the
+  // 768px threshold matches the point where two side-by-side panes genuinely stop fitting comfortably,
+  // wider than the admin nav drawer's own 1024px breakpoint since this page's minimum usable width is
+  // narrower than the shell chrome's. Below it, show one full-width pane at a time (list or thread)
+  // instead, toggled by admin-chat.component.ts's isMobile()+activeSeller() state via the --hidden
+  // classes below, matching the standard mobile messaging-app pattern.
+  &--mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-chat__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  background: var(--ecom-surface);
+  border: 1px solid var(--ecom-border);
+  border-radius: var(--ecom-radius);
+  padding: 8px;
+
+  &--hidden {
+    display: none;
+  }
+}
+
+// Same visual language as KYC Review's search box (.kyc-review__search).
+.admin-chat__search {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--ecom-border);
+  background: var(--ecom-surface-alt);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--ecom-text-muted);
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--ecom-text);
+    font-family: inherit;
+    font-size: 0.85rem;
+
+    &::placeholder {
+      color: var(--ecom-text-muted);
+    }
+  }
+}
+
+.admin-chat__search-results {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ecom-border);
+}
+
+.admin-chat__search-loading {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.admin-chat__search-empty {
+  margin: 0;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  color: var(--ecom-text-muted);
+}
+
+.admin-chat__search-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+}
+
+.admin-chat__search-result-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.seller-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    background: var(--ecom-surface-alt);
+  }
+
+  &--active {
+    background: rgba(99, 102, 241, 0.14);
+  }
+}
+
+.seller-row__avatar {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--ecom-indigo-dim);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  overflow: hidden;
+}
+
+// Shown in place of the initials when the seller's latest message is a sent image — a quick visual
+// peek at the photo without opening the thread.
+.seller-row__avatar-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.seller-row__dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6b7280;
+  border: 2px solid var(--ecom-surface);
+
+  &--online {
+    background: #22c55e;
+  }
+}
+
+.seller-row__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.seller-row__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.seller-row__name {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ecom-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.seller-row__time {
+  flex: none;
+  font-size: 0.68rem;
+  color: var(--ecom-text-muted);
+}
+
+.seller-row__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.seller-row__preview {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--ecom-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  mat-icon {
+    flex: none;
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.seller-row__badge {
+  flex: none;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-chat__thread {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--ecom-surface);
+  border: 1px solid var(--ecom-border);
+  border-radius: var(--ecom-radius);
+  overflow: hidden;
+
+  // app-chat-thread fills whatever height its container gives it (:host { height: 100% }) — with
+  // .admin-chat__thread now flex-column for the mobile back button above, it needs flex: 1 so the
+  // thread still claims the remaining space instead of collapsing to its content's natural height.
+  app-chat-thread {
+    flex: 1;
+    min-height: 0;
+  }
+
+  &--hidden {
+    display: none;
+  }
+}
+
+.admin-chat__back {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 14px;
+  border: none;
+  border-bottom: 1px solid var(--ecom-border);
+  background: none;
+  color: var(--ecom-text);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+
+  mat-icon {
+    flex: none;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--ecom-text-muted);
+  }
+}
+
+@include bp.mobile {
+  .admin-chat__search {
+    height: 44px;
+  }
+
+  .seller-row {
+    padding: 12px 10px;
+  }
+}
+
+.admin-chat__placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--ecom-text-muted);
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}

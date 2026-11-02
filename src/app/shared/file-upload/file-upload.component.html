@@ -1,0 +1,39 @@
+<div class="file-upload" [class.file-upload--light]="theme === 'light'" [class.file-upload--dense]="dense">
+  <div
+    class="file-drop"
+    role="button"
+    tabindex="0"
+    (click)="fileInput.click()"
+    (keydown.enter)="fileInput.click()"
+    (keydown.space)="$event.preventDefault(); fileInput.click()"
+    (dragover)="$event.preventDefault()"
+    (drop)="onDrop($event)"
+  >
+    <mat-icon>cloud_upload</mat-icon>
+    <p class="file-drop__label">Drag files here or <span class="file-drop__browse">browse</span></p>
+    <p class="file-drop__hint">{{ hint }}</p>
+  </div>
+  <!-- A sibling of .file-drop, not a child of it: input.click() fires its own bubbling 'click' event,
+       which would otherwise climb straight back into .file-drop's own click handler above (nested
+       input -> event bubbles through .file-drop -> handler re-fires -> a second, duplicate picker
+       trigger per real click). As a sibling it bubbles through .file-upload instead, never re-entering. -->
+  <input #fileInput type="file" [attr.accept]="accept" [attr.multiple]="multiple ? true : null" (change)="onFileInput($event)" hidden />
+
+  @if (files.length > 0) {
+    <ul class="file-list">
+      @for (file of files; track file.name + file.size) {
+        <li class="file-list__item">
+          @if (previewFor(file); as preview) {
+            <img class="file-list__thumb" [src]="preview" alt="" />
+          } @else {
+            <mat-icon>description</mat-icon>
+          }
+          <span class="file-list__name">{{ file.name }}</span>
+          <button mat-icon-button type="button" (click)="remove(file)" aria-label="Remove file">
+            <mat-icon>close</mat-icon>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

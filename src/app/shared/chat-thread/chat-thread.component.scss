@@ -1,0 +1,361 @@
+// Self-contained light chat surface — used inside both the (light) seller portal and the (dark)
+// admin shell, so it deliberately doesn't inherit either app's theme tokens.
+@use '../styles/breakpoints' as bp;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  color-scheme: light;
+  color: #111827;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.chat-thread {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.chat-thread__header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.chat-thread__counterpart {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #111827;
+}
+
+.chat-thread__presence-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #9ca3af;
+
+  &--online {
+    background: #22c55e;
+  }
+}
+
+.chat-thread__reconnecting {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #d97706;
+}
+
+.chat-thread__delete {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  // #9ca3af read at ~2.5:1 against the white header — #57606e clears WCAG AA (~7.6:1).
+  color: #57606e;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+  }
+
+  @include bp.mobile {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.chat-thread__spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  border-top-color: #d97706;
+  animation: chat-spin 0.7s linear infinite;
+}
+
+@keyframes chat-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// justify-content: flex-end (previously here to hug short conversations to the bottom) is a known
+// flexbox trap combined with overflow-y: auto — once content overflows, the browser distributes the
+// overflow as unreachable negative space at the flex-start instead of making it scrollable, so the
+// scrollbar reports no overflow at all (scrollHeight === clientHeight) even though the bubbles are
+// genuinely taller than the box. Bottom-pinning is handled entirely by JS instead (scrollToBottom()
+// below, already wired to run on connect and on new messages while the user hasn't scrolled up) —
+// that's the correct, standard way every major chat UI keeps the newest message in view.
+.chat-thread__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #f9fafb;
+}
+
+.chat-thread__history-loading {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0 12px;
+
+  .chat-thread__spinner {
+    border-top-color: #0f1f3d;
+  }
+}
+
+.chat-thread__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  // #9ca3af read at ~2.5:1 against the #f9fafb scroll background — #57606e clears WCAG AA.
+  color: #57606e;
+  text-align: center;
+
+  mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+  }
+}
+
+// Message bubble styling (.chat-bubble-row/__bubble/__tick etc.) lives in ChatBubbleComponent now —
+// see shared/chat-bubble, rendered via <app-chat-bubble> below instead of inline markup here.
+
+.chat-thread__composer {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  // On mobile this composer often sits flush against the physical bottom edge (the thread fills the
+  // full viewport height there — see admin-chat/seller-chat's mobile single-pane layout), so it needs
+  // the safe-area inset to clear the iOS home-indicator strip; harmless no-op elsewhere.
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+
+  textarea {
+    flex: 1;
+    height: 40px;
+    max-height: 120px;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 20px;
+    outline: none;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: #111827;
+    resize: none;
+    overflow-y: auto;
+    line-height: 1.3;
+
+    &:focus {
+      border-color: #0f1f3d;
+    }
+
+    &::placeholder {
+      color: #6b7280;
+    }
+
+    // 16px is the minimum font-size that keeps iOS Safari from auto-zooming the page on focus —
+    // below that, focusing the composer to type a multi-line message zooms the whole layout in.
+    @include bp.mobile {
+      font-size: 16px;
+    }
+  }
+}
+
+.chat-thread__send {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #0f1f3d;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: #16264a;
+  }
+
+  @include bp.mobile {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.chat-thread__attach {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover:not(:disabled) {
+    background: #f3f4f6;
+    color: #0f1f3d;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @include bp.mobile {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.chat-thread__attachment-preview {
+  flex: none;
+  position: relative;
+  width: fit-content;
+  margin: 8px 16px 0;
+
+  img {
+    display: block;
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid #e5e7eb;
+  }
+}
+
+.chat-thread__attachment-file {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 220px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 0.8rem;
+
+  mat-icon {
+    flex: none;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #6b7280;
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.chat-thread__attachment-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    background: #f3f4f6;
+    color: #111827;
+  }
+}
+
+.chat-thread__attachment-error {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 16px 0;
+  font-size: 0.78rem;
+  color: #ef4444;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}

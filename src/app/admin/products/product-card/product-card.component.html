@@ -1,0 +1,51 @@
+<div class="product-card">
+  <div class="product-card__image-wrap">
+    @if (product.imageUrl) {
+      <img
+        class="product-card__image"
+        [src]="fileUrl(product.imageUrl)"
+        [alt]="product.name"
+        (click)="openImage($event, product.imageUrl)"
+      />
+    } @else {
+      <div class="product-card__image product-card__image--placeholder">
+        <mat-icon>image</mat-icon>
+      </div>
+    }
+
+    <div class="product-card__overlay"></div>
+
+    <span class="product-card__price">{{ formatCurrency(product.price) }}</span>
+    <span class="product-card__profit">{{ formatCurrency(product.profit) }}</span>
+
+    <div class="product-card__menu">
+      <button type="button" class="product-card__menu-trigger" (click)="toggleMenu($event)" aria-label="Product actions">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+      @if (menuOpen()) {
+        <div class="product-card__menu-panel" (click)="$event.stopPropagation()">
+          <button type="button" class="product-card__menu-item" (click)="onAssignOrder()">
+            <mat-icon>person_add</mat-icon>
+            Assign Order
+          </button>
+          <button type="button" class="product-card__menu-item" (click)="onEditProduct()">
+            <mat-icon>edit</mat-icon>
+            Edit Product
+          </button>
+          <button type="button" class="product-card__menu-item product-card__menu-item--red" (click)="onDeleteProduct()">
+            <mat-icon>delete</mat-icon>
+            Delete Product
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="product-card__body">
+    <h3 class="product-card__name">{{ product.name }}</h3>
+    @if (product.description) {
+      <p class="product-card__description">{{ product.description }}</p>
+    }
+  </div>
+</div>

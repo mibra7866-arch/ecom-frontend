@@ -1,0 +1,26 @@
+<div class="fin-modal">
+  <header class="fin-modal__header">
+    <h2>Credit Score</h2>
+    <p>{{ data.storeName }} — current score: <strong>{{ data.currentScore }}</strong></p>
+  </header>
+
+  <div class="fin-modal__body">
+    <label class="fin-modal__field">
+      <span>New credit score (0–100)</span>
+      <div class="fin-modal__amount">
+        <input type="number" min="0" max="100" step="1" placeholder="100" [value]="score() ?? ''" (input)="onScoreInput($any($event.target).value)" />
+      </div>
+      <span class="fin-modal__hint">Below 90 blocks this seller's withdrawals.</span>
+    </label>
+
+    <label class="fin-modal__field">
+      <span>Reason</span>
+      <textarea rows="3" placeholder="Why is this score changing?" [value]="reason()" (input)="reason.set($any($event.target).value)"></textarea>
+    </label>
+  </div>
+
+  <footer class="fin-modal__footer">
+    <button type="button" class="fin-modal__btn fin-modal__btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="fin-modal__btn fin-modal__btn--solid" [disabled]="!canApply()" (click)="apply()">Apply</button>
+  </footer>
+</div>

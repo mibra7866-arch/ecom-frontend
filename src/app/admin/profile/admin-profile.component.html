@@ -1,0 +1,218 @@
+<div class="list-page scroll-fixed admin-profile">
+  <div class="list-page__header">
+    <h1>Profile</h1>
+  </div>
+
+  <div class="scroll-area admin-profile__scroll">
+    <div class="admin-profile__stack">
+      <!-- Header banner: avatar, name, role/LLC-codes pills, member-since — same left-aligned
+           avatar+info row as the Seller Profile header, adapted to an admin's own fields. -->
+      <div class="admin-profile__banner">
+        <div class="admin-profile__avatar-wrap">
+          <div class="admin-profile__avatar">{{ (profile()?.name || profile()?.username || '?').charAt(0).toUpperCase() }}</div>
+        </div>
+        @if (profile(); as p) {
+          <div class="admin-profile__banner-info">
+            <h1 class="admin-profile__name">{{ p.name || p.username }}</h1>
+            <p class="admin-profile__owner">{{ p.username }}@if (p.email) { &nbsp;·&nbsp; {{ p.email }} }</p>
+
+            <div class="admin-profile__pills">
+              <span class="admin-profile__pill">{{ p.role }}</span>
+              <span class="admin-profile__pill">LLC Codes Created: {{ p.invitationCodesCreated }}</span>
+            </div>
+
+            <p class="admin-profile__member-since">Member since {{ p.createdDate | date: 'MMM yyyy' }}</p>
+          </div>
+        }
+      </div>
+
+      @if (profileError()) {
+        <div class="error-banner">
+          <mat-icon>error</mat-icon>
+          <span>{{ profileError() }}</span>
+        </div>
+      }
+
+      @if (profileLoading()) {
+        <div class="admin-profile__loading"><mat-spinner diameter="28"></mat-spinner></div>
+      }
+
+      <!-- Settings menu -->
+      <div class="admin-profile__menu">
+        <button type="button" class="admin-profile__menu-row" (click)="editProfile()">
+          <span class="admin-profile__menu-icon admin-profile__menu-icon--indigo"><mat-icon>person</mat-icon></span>
+          <span class="admin-profile__menu-text">
+            <span class="admin-profile__menu-title">Account</span>
+            <span class="admin-profile__menu-subtitle">Name &amp; email</span>
+          </span>
+          <mat-icon class="admin-profile__menu-chevron">chevron_right</mat-icon>
+        </button>
+      </div>
+
+      <!-- Bank Accounts -->
+      <div class="admin-profile__card">
+        <div class="admin-profile__card-header">
+          <h2>Bank Accounts</h2>
+          <button mat-button color="primary" (click)="addAccount('Bank')">
+            <mat-icon>add</mat-icon>
+            Add Account
+          </button>
+        </div>
+
+        @if (accountsError() || bankAccountsError()) {
+          <div class="error-banner">
+            <mat-icon>error</mat-icon>
+            <span>{{ accountsError() || bankAccountsError() }}</span>
+          </div>
+        }
+
+        @if (accountsLoading()) {
+          <mat-spinner diameter="24"></mat-spinner>
+        } @else if (bankAccounts().length === 0) {
+          <p class="admin-profile__hint">No bank accounts on file yet.</p>
+        } @else {
+          <div class="admin-profile__accounts">
+            @for (account of bankAccounts(); track account.id) {
+              <div class="admin-profile__account" [class.admin-profile__account--default]="account.isDefault">
+                <div class="admin-profile__account-info">
+                  <div class="admin-profile__account-top">
+                    <span class="admin-profile__account-bank">{{ account.bankName }}</span>
+                    @if (account.isDefault) {
+                      <span class="admin-profile__default-badge">Default</span>
+                    }
+                  </div>
+                  <span class="admin-profile__account-sub">{{ account.accountHolderName }} · {{ account.accountNumber }}</span>
+                  @if (account.iban) {
+                    <span class="admin-profile__account-sub">IBAN: {{ account.iban }}</span>
+                  }
+                </div>
+                <div class="admin-profile__account-actions">
+                  <button type="button" class="admin-profile__account-btn" (click)="editAccount(account)">Edit</button>
+                  @if (!account.isDefault) {
+                    <button type="button" class="admin-profile__account-btn" (click)="setDefaultAccount(account)">Set Default</button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- E Vault — same record shape/endpoints as Bank Accounts above, filtered to accountType:
+           'EVault' (see admin-profile.component.ts). Identical markup to the Bank Accounts card on
+           purpose, just pointed at eVaultAccounts()/addAccount('EVault'). -->
+      <div class="admin-profile__card">
+        <div class="admin-profile__card-header">
+          <h2>E Vault</h2>
+          <button mat-button color="primary" (click)="addAccount('EVault')">
+            <mat-icon>add</mat-icon>
+            Add E Vault
+          </button>
+        </div>
+
+        @if (accountsError() || eVaultAccountsError()) {
+          <div class="error-banner">
+            <mat-icon>error</mat-icon>
+            <span>{{ accountsError() || eVaultAccountsError() }}</span>
+          </div>
+        }
+
+        @if (accountsLoading()) {
+          <mat-spinner diameter="24"></mat-spinner>
+        } @else if (eVaultAccounts().length === 0) {
+          <p class="admin-profile__hint">No E Vault accounts on file yet.</p>
+        } @else {
+          <div class="admin-profile__accounts">
+            @for (account of eVaultAccounts(); track account.id) {
+              <div class="admin-profile__account" [class.admin-profile__account--default]="account.isDefault">
+                <div class="admin-profile__account-info">
+                  <div class="admin-profile__account-top">
+                    <span class="admin-profile__account-bank">{{ account.bankName }}</span>
+                    @if (account.isDefault) {
+                      <span class="admin-profile__default-badge">Default</span>
+                    }
+                  </div>
+                  <span class="admin-profile__account-sub">{{ account.accountHolderName }} · {{ account.accountNumber }}</span>
+                </div>
+                <div class="admin-profile__account-actions">
+                  <button type="button" class="admin-profile__account-btn" (click)="editAccount(account)">Edit</button>
+                  @if (!account.isDefault) {
+                    <button type="button" class="admin-profile__account-btn" (click)="setDefaultAccount(account)">Set Default</button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Change Password -->
+      <div class="admin-profile__card">
+        <div class="admin-profile__card-header">
+          <h2>Change Password</h2>
+        </div>
+        <p class="admin-profile__hint">The password you use to sign in to the Admin Portal.</p>
+
+        @if (passwordError()) {
+          <div class="error-banner">
+            <mat-icon>error</mat-icon>
+            <span>{{ passwordError() }}</span>
+          </div>
+        }
+
+        <form class="admin-profile__form" (submit)="$event.preventDefault(); changePassword()">
+          <label class="admin-profile__field">
+            <span>Current password</span>
+            <input type="password" [value]="currentPassword()" (input)="currentPassword.set($any($event.target).value)" autocomplete="current-password" />
+          </label>
+          <label class="admin-profile__field">
+            <span>New password</span>
+            <input type="password" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" autocomplete="new-password" />
+          </label>
+          <label class="admin-profile__field">
+            <span>Confirm new password</span>
+            <input type="password" [value]="confirmNewPassword()" (input)="confirmNewPassword.set($any($event.target).value)" autocomplete="new-password" />
+          </label>
+          <button type="submit" mat-flat-button color="primary" [disabled]="!canSavePassword()">
+            {{ passwordSaving() ? 'Updating…' : 'Update' }}
+          </button>
+        </form>
+      </div>
+
+      <!-- Transaction Password -->
+      <div class="admin-profile__card">
+        <div class="admin-profile__card-header">
+          <h2>Transaction Password</h2>
+        </div>
+        <p class="admin-profile__hint">Used to authorize transactions — separate from your login password.</p>
+
+        @if (txnPasswordError()) {
+          <div class="error-banner">
+            <mat-icon>error</mat-icon>
+            <span>{{ txnPasswordError() }}</span>
+          </div>
+        }
+
+        <form class="admin-profile__form" (submit)="$event.preventDefault(); saveTransactionPassword()">
+          @if (hasTransactionPassword()) {
+            <label class="admin-profile__field">
+              <span>Current transaction password</span>
+              <input type="password" [value]="currentTxnPassword()" (input)="currentTxnPassword.set($any($event.target).value)" autocomplete="off" />
+            </label>
+          }
+          <label class="admin-profile__field">
+            <span>New transaction password</span>
+            <input type="password" [value]="newTxnPassword()" (input)="newTxnPassword.set($any($event.target).value)" autocomplete="off" />
+          </label>
+          <label class="admin-profile__field">
+            <span>Confirm new transaction password</span>
+            <input type="password" [value]="confirmNewTxnPassword()" (input)="confirmNewTxnPassword.set($any($event.target).value)" autocomplete="off" />
+          </label>
+          <button type="submit" mat-flat-button color="primary" [disabled]="!canSaveTxnPassword()">
+            {{ txnPasswordSaving() ? 'Updating…' : hasTransactionPassword() ? 'Update' : 'Set Password' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
